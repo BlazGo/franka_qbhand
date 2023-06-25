@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="tf" type="static_transform_publisher" name="flange_tf" args="0.1 0 0 0 0 0 1 /panda_EE /flange 100"/>
+</launch>
