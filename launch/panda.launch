@@ -10,7 +10,8 @@
 
   <!-- Robot Customization -->
   <arg name="arm_id"      default="panda" doc="Name of the panda robot to spawn" />
-  <arg name="use_gripper" default="false"  doc="Should a franka hand be mounted on the flange?" />
+  <arg name="qbhand"      default="true"  doc="Use qbhand or not" />
+  <arg name="use_gripper" default="false" doc="Should a franka hand be mounted on the flange?" />
   <arg name="controller"  default=" "     doc="Which example controller should be started? (One of {cartesian_impedance,model,force,joint_position,joint_velocity}_example_controller)" />
   <arg name="x"           default="0"     doc="How far forward to place the base of the robot in [m]?" />
   <arg name="y"           default="0"     doc="How far leftwards to place the base of the robot in [m]?" />
@@ -42,10 +43,11 @@
   </include>
 
   <param name="robot_description"
-         command="xacro $(find franka_description)/robots/panda/panda.urdf.xacro
+         command="xacro $(find franka_qbhand)/urdf/panda.urdf.xacro
                   gazebo:=true
                   hand:=$(arg use_gripper)
                   arm_id:=$(arg arm_id)
+                  qbhand:=$(arg qbhand)
                   xyz:='$(arg x) $(arg y) $(arg z)'
                   rpy:='$(arg roll) $(arg pitch) $(arg yaw)'
                   $(arg xacro_args)">
