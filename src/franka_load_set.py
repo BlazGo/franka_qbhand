@@ -4,7 +4,8 @@ from franka_msgs.srv import SetLoad, SetLoadRequest, SetLoadResponse
 class SetLoadService:
     def __init__(self, node_name:str="set_qbhand_load") -> None:
         rospy.init_node(node_name)
-        self.client = rospy.ServiceProxy("/franka_control/set_load", SetLoad)
+        self.client = rospy.ServiceProxy("/franka_control/set_load",
+                                         SetLoad)
     
     def send_request(self, 
                      mass:float=1.0,

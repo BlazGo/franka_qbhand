@@ -7,7 +7,7 @@ class SetCartesianImpedanceParams:
     
     def set_params(self,
                    name:str="/cartesian_impedance_example_controller/dynamic_reconfigure_compliance_param_node/translational_stiffness",
-                   value:float=500.0):
+                   value:float=400.0):
         rospy.set_param(param_name=name,
                         param_value=value)
 
