@@ -10,10 +10,7 @@ class SetEEFrameService:
     
     def send_request(self, NE_T_EE:list):
         msg = SetEEFrameRequest()
-        msg.NE_T_EE = [1.0, 0.0, 0.0, 0.0,
-                       0.0, 1.0, 0.0, 0.0,
-                       0.0, 0.0, 1.0, 0.6,
-                       0.0, 0.0, 0.0, 1.0]
+        msg.NE_T_EE = NE_T_EE
         respone = self.client.call(msg)
         print(f"Response: {respone}")
 
