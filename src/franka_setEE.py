@@ -54,7 +54,10 @@ if __name__ == "__main__":
     print(t)
     
     srv_ee = SetEEFrameService()
-    srv_ee.send_request([1])
+    srv_ee.send_request([1.0, 0.0, 0.0, 0.0,
+                         0.0, 1.0, 0.0, 0.0,
+                         0.0, 0.0, 1.0, 0.0,
+                         0.0, 0.0, 0.0, 1.0])
     
     t = tf_listener.lookupTransform("/panda_link0", "/panda_EE", rospy.Time(0))
     print(t)
