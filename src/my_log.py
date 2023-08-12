@@ -19,9 +19,20 @@ BOLD = '\033[1m'
 UNDERLINE = '\033[4m'
 
 
-def cprint(msg):
+def cprint(level, msg, allign=False):
     date = f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}"
-    print(date, end="")
+    if level == DEBUG:
+        prefix = f" {CYAN}[{allign*' '}DEBUG{allign*' '}]{END} "
+    elif level == INFO:
+        prefix = f" {GREEN}[{allign*' '}INFO{allign*'  '}]{END} "
+    elif level == WARNING:
+        prefix = f" {YELLOW}[WARNING]{END} "
+    elif level == ERROR:
+        prefix = f" {RED}[{allign*' '}ERROR{allign*' '}]{END} " 
+    elif level == CRITICAL:
+        prefix = f" {BOLD}{RED}[!CRITICAL!]{END} "
+        
+    print(date + prefix, end="")
     print(msg)
 
 class logger:
@@ -29,27 +40,29 @@ class logger:
         self.level = level
         self.name = name
         self.allign = allign
-        self.info(f"Logger '{BLUE}{self.name}{END}' with level {BLUE}{self.level}{END}")
     
+    def _print_logger_info(self):
+        self.info(f"Logger '{BLUE}{self.name}{END}' with level {BLUE}{self.level}{END}")
+        
     def debug(self, message):
         if self.level <= DEBUG:
-            cprint(f" {CYAN}[{self.allign*' '}DEBUG{self.allign*' '}]{END} " + message)  
+            cprint(level=10, msg=message, allign=self.allign)
     
     def info(self, message):
         if self.level <= INFO:
-            cprint(f" {GREEN}[{self.allign*' '}INFO{self.allign*'  '}]{END} " + message)
+            cprint(level=20, msg=message, allign=self.allign)
     
     def warning(self, message):
         if self.level <= WARNING:
-            cprint(f" {YELLOW}[WARNING]{END} " + message)
+            cprint(level=30, msg=message, allign=self.allign)
     
     def error(self, message):
         if self.level <= ERROR:
-            cprint(f" {RED}[{self.allign*' '}ERROR{self.allign*' '}]{END} " + message)        
+            cprint(level=40, msg=message, allign=self.allign)
     
     def critical(self, message):
         if self.level <= CRITICAL:
-            cprint(f" {RED}[CRITICAL]{END} " + message)        
+            cprint(level=50, msg=message, allign=self.allign)
 
 if __name__ == "__main__":
     log = logger(level=DEBUG, allign=True)
