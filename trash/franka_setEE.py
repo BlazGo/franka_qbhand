@@ -12,8 +12,9 @@ class SetEEFrameService:
         msg = SetEEFrameRequest()
         msg.NE_T_EE = NE_T_EE
         respone = self.client.call(msg)
-        print(f"Response: {respone}")
-
+        return respone
+    
+    
 class SetLoadService:
     def __init__(self) -> None:
         self.client = rospy.ServiceProxy("/franka_control/set_load",
@@ -34,8 +35,8 @@ class SetLoadService:
         # response has attributes:
         # success: true/false
         # error: ''
-        print(f"Response: {response}")
         return response
+
 
 if __name__ == "__main__":
     rospy.init_node("ee_setup")
