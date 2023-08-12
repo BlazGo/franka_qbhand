@@ -12,6 +12,7 @@ log = my_log.logger()
 
 class PandaRobotCustom:
     # topics
+    set_EE_frame_topic = "/franka_control/set_EE_frame"
     franka_state_topic = "/franka_state_controller/franka_states"
     compliance_topic = "/cartesian_impedance_example_controller/dynamic_reconfigure_compliance_param_node"
     set_EE_load_topic = "/franka_control/set_load"
@@ -22,14 +23,16 @@ class PandaRobotCustom:
 
     def __init__(self):
         log.info("Initializing PandaRobot class")
-        
+    
+        self.compliance_client = Client(self.compliance_topic, timeout=1)
         self.state_listener = rospy.Subscriber(self.franka_state_topic,
                                                FrankaState,
                                                callback=self.franka_state_callback,
                                                queue_size=1,)
-        self.set_EE_frame_client = rospy.ServiceProxy("/franka_control/set_EE_frame", SetEEFrame)
-        self.set_load_client = rospy.ServiceProxy(self.set_EE_load_topic, SetLoad)
-        self.compliance_client = Client(self.compliance_topic, timeout=1)
+        
+        # Services
+        self.set_EE_frame_client = rospy.ServiceProxy(self.set_EE_frame_topic, SetEEFrame)
+        self.set_EE_load_client = rospy.ServiceProxy(self.set_EE_load_topic, SetLoad)
         self.controller_client = rospy.ServiceProxy(self.switch_controller_topic, SwitchController)
          
         rospy.sleep(0.5)
@@ -75,13 +78,13 @@ class PandaRobotCustom:
         msg.F_x_center_load = F_x_center_load  # translation vector
         msg.load_inertia = load_inertia        # inertia matrix (one line)
         
-        response = self.set_EE_frame_client.call(msg)
+        response = self.set_EE_load_client.call(msg)
         # response has attributes:
         # success: true/false
         # error: ''
         return response
 
-    def switch_controller(self, start_controllers: list, stop_controllers: list, strictness: int = BEST_EFFORT, start_asap:bool=False):
+    def switch_controllers(self, start_controllers: list, stop_controllers: list, strictness: int = BEST_EFFORT, start_asap:bool=False):
         msg = SwitchControllerRequest()
         msg.start_controllers = start_controllers
         msg.stop_controllers = stop_controllers
@@ -95,4 +98,13 @@ class PandaRobotCustom:
 if __name__ == "__main__":
     rospy.init_node("panda_custom", anonymous=True)
     robot = PandaRobotCustom()
-    print(robot.get_state())
+    print(robot.get_state().NE_T_EE)
+    
+    mass = 0.76
+    Fx_frame = [0.1, 0.0, 0.05]
+    inertia = [0.001333, 0.0,     0.0,
+               0.0,      0.00347, 0.0,
+               0.0,      0.0,     0.00453]
+    
+    response = robot.set_EE_load(mass=mass, F_x_center_load=Fx_frame, load_inertia=inertia)
+    
