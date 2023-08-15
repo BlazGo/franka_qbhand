@@ -3,7 +3,8 @@ from dynamic_reconfigure.client import Client
 from franka_msgs.msg import FrankaState
 from franka_msgs.srv import SetEEFrame, SetEEFrameRequest, SetEEFrameResponse
 from franka_msgs.srv import SetLoad, SetLoadRequest, SetLoadResponse
-from controller_manager_msgs.srv import SwitchController, SwitchControllerRequest
+from controller_manager_msgs.srv import SwitchController, SwitchControllerRequest, SwitchControllerResponse
+from controller_manager_msgs.srv import ListControllers, ListControllersRequest, ListControllersResponse
 import numpy as np
 import my_log
 
@@ -17,6 +18,8 @@ class PandaRobotCustom:
     compliance_topic = "/cartesian_impedance_example_controller/dynamic_reconfigure_compliance_param_node"
     set_EE_load_topic = "/franka_control/set_load"
     switch_controller_topic = "controller_manager/switch_controller"
+    list_controllers_topic = "controller_manager/list_controllers"
+
     # controller strategies
     STRICT: int = 2
     BEST_EFFORT: int = 1
@@ -33,18 +36,19 @@ class PandaRobotCustom:
         # Services
         self.set_EE_frame_client = rospy.ServiceProxy(self.set_EE_frame_topic, SetEEFrame)
         self.set_EE_load_client = rospy.ServiceProxy(self.set_EE_load_topic, SetLoad)
-        self.controller_client = rospy.ServiceProxy(self.switch_controller_topic, SwitchController)
-         
+        self.switch_controller_proxy = rospy.ServiceProxy(self.switch_controller_topic, SwitchController)
+        self.list_controllers_proxy = rospy.ServiceProxy(self.list_controllers_topic, ListControllers)
         rospy.sleep(0.5)
         log.info("Panda initialized")
     
-    def franka_state_callback(self, msg):
+    def franka_state_callback(self, msg) -> None:
         # Save the state
         self.state = msg
         log.debug("Callback recieved")    
         
-    def get_state(self):
+    def get_state(self) -> FrankaState:
         # Return the robot state msg
+        # TODO prettier parsing?
         return self.state
 
     def set_stiffness(self, trans: float = None, rot: float = None, null: float = None):
@@ -61,18 +65,13 @@ class PandaRobotCustom:
         response = self.compliance_client.update_configuration(config)
         return response
     
-    def set_NE_T_EE_transform(self, NE_T_EE:np.ndarray):
+    def set_NE_T_EE_transform(self, NE_T_EE:np.ndarray) -> SetEEFrameResponse:
         msg = SetEEFrameRequest()
         msg.NE_T_EE = NE_T_EE
         respone = self.set_EE_frame_client.call(msg)
         return respone
     
-    def set_EE_load(self, 
-                     mass:float=0.0,
-                     F_x_center_load:list=[0.0, 0.0, 0.0],
-                     load_inertia:list=[0.0, 0.0, 0.0,
-                                        0.0, 0.0, 0.0,
-                                        0.0, 0.0, 0.0]) -> SetLoadResponse:
+    def set_EE_load(self, mass:float=0.0, F_x_center_load:list=[0.0, 0.0, 0.0], load_inertia:list=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) -> SetLoadResponse:
         msg = SetLoadRequest()
         msg.mass = mass                        # [kg] 
         msg.F_x_center_load = F_x_center_load  # translation vector
@@ -84,7 +83,7 @@ class PandaRobotCustom:
         # error: ''
         return response
 
-    def switch_controllers(self, start_controllers: list, stop_controllers: list, strictness: int = BEST_EFFORT, start_asap:bool=False):
+    def switch_controller(self, start_controllers: list, stop_controllers: list, strictness: int = BEST_EFFORT, start_asap:bool=False) -> SwitchControllerResponse:
         msg = SwitchControllerRequest()
         msg.start_controllers = start_controllers
         msg.stop_controllers = stop_controllers
@@ -92,8 +91,13 @@ class PandaRobotCustom:
         msg.start_asap = start_asap
         msg.timeout = 1.0
         
-        response = self.controller_client.call(msg)
+        response = self.switch_controller_proxy.call(msg)
         return response
+
+    def list_controllers(self) -> ListControllersResponse:
+        msg = ListControllersRequest()
+        response = self.list_controllers_proxy.call(msg)
+        return response.controller # Unpacks the actual list from msg
 
 if __name__ == "__main__":
     rospy.init_node("panda_custom", anonymous=True)
@@ -105,6 +109,6 @@ if __name__ == "__main__":
     inertia = [0.001333, 0.0,     0.0,
                0.0,      0.00347, 0.0,
                0.0,      0.0,     0.00453]
-    
-    response = robot.set_EE_load(mass=mass, F_x_center_load=Fx_frame, load_inertia=inertia)
+    print(robot.list_controllers())
+    #response = robot.set_EE_load(mass=mass, F_x_center_load=Fx_frame, load_inertia=inertia)
     
