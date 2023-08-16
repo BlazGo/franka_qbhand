@@ -8,19 +8,20 @@ WARNING = 30
 ERROR = 40
 CRITICAL = 50
 
+CYAN = '\033[96m'
 HEADER = '\033[95m'
 BLUE = '\033[94m'
-CYAN = '\033[96m'
-GREEN = '\033[92m'
 YELLOW = '\033[93m'
+GREEN = '\033[92m'
 RED = '\033[91m'
+GRAY = '\033[90m'
 END = '\033[0m'
 BOLD = '\033[1m'
 UNDERLINE = '\033[4m'
 
 
 def cprint(level, msg, allign=False):
-    date = f"{datetime.datetime.now():%Y-%m-%d %H:%M:%S}"
+    date = f"{GRAY}{datetime.datetime.now():%Y-%m-%d %H:%M:%S}{END}"
     if level == DEBUG:
         prefix = f" {CYAN}[{allign*' '}DEBUG{allign*' '}]{END} "
     elif level == INFO:
@@ -33,8 +34,8 @@ def cprint(level, msg, allign=False):
         prefix = f" {BOLD}{RED}[!CRITICAL!]{END} "
         
     print(date + prefix, end="")
-    print(msg)
-
+    print(msg, end="") # separate prints
+    print(END)
 class logger:
     def __init__(self, level:int=INFO, name:str=__name__, allign:bool=False) -> None:
         self.level = level
