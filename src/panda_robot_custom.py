@@ -14,7 +14,6 @@ import tools
 
 log = my_log.logger()
 
-
 class PandaRobotCustom:
     # topics
     set_EE_frame_topic = "/franka_control/set_EE_frame"
@@ -74,8 +73,8 @@ class PandaRobotCustom:
         pose = self.get_cart_pose()
         self.q_init = self.get_state().q
         self.cart_init = pose
-        log.info(f"cart pose:\ntrans:{pose[0]}, rot: {euler_from_quaternion(pose[1])}")
-        log.info(f"q: {self.q_init}")
+        log.info(f"Trans:{pose[0]}, Rot: {euler_from_quaternion(pose[1])}")
+        log.info(f"q_states: {self.q_init}")
 
         # EE frame transformation construction
         T_trans = np.eye(4)
@@ -118,7 +117,7 @@ class PandaRobotCustom:
         if self.tf_listener.frameExists(frame0) and self.tf_listener.frameExists(frame1):
             t = self.tf_listener.getLatestCommonTime(frame0, frame1)
             trans, rot = self.tf_listener.lookupTransform(frame0, frame1, t)
-            log.info(f"Trans: {trans}, Rot: {rot}")
+            #log.info(f"Trans: {trans}, Rot: {rot}")
             return trans, rot
         else:
             log.error(f"Transform could not be fetched ('{frame0}' to '{frame1}')")
