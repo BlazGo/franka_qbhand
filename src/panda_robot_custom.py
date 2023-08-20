@@ -1,5 +1,6 @@
 import rospy
 import tf
+from tf.transformations import quaternion_from_euler, euler_from_quaternion
 from dynamic_reconfigure.client import Client
 from geometry_msgs.msg import PoseStamped
 from franka_msgs.msg import FrankaState
@@ -9,6 +10,7 @@ from controller_manager_msgs.srv import SwitchController, SwitchControllerReques
 from controller_manager_msgs.srv import ListControllers, ListControllersRequest, ListControllersResponse
 import numpy as np
 import my_log
+import tools
 
 log = my_log.logger()
 
@@ -23,8 +25,8 @@ class PandaRobotCustom:
     list_controllers_topic = "controller_manager/list_controllers"
     cartesian_pose_topic = "/cartesian_impedance_example_controller/equilibrium_pose"
 
-    base_link = "panda_link0"
-    EE_frame = "panda_EE"
+    BASE_LINK:str = "panda_link0"
+    EE_frame:str = "panda_EE"
 
     # controller strategies
     STRICT: int = 2
@@ -53,29 +55,54 @@ class PandaRobotCustom:
         self.list_controllers_proxy = rospy.ServiceProxy(
             self.list_controllers_topic, ListControllers)
         rospy.sleep(0.5)
+        self.init_robot()
 
         log.info(f"Panda initialization {my_log.GREEN}DONE")
 
-        self.init_robot()
-
     def init_robot(self):
-        self.used_controllers = [cnt.name for cnt in self.list_controllers()]
+        self.used_controllers:list = [cnt.name for cnt in self.list_controllers()]
         
         # Stiffness setup
+        log.info(f"Setting stiffness")
         log.info(f"Old stiffness: {self.get_stiffness()}")
         self.set_stiffness(trans=400.0, rot=20.0, null=1.0)
         log.info(f"New stiffness: {self.get_stiffness()}")
         # Wait for he robot to stop moving
-        rospy.sleep(2.0)
+        rospy.sleep(1.5)
         
         # Get init pose
-        log.info(f"{self.get_state().q}, {self.get_state().NE_T_EE}")
         pose = self.get_cart_pose()
-        log.info(f"Cartesian pose: {pose}")
         self.q_init = self.get_state().q
         self.cart_init = pose
+        log.info(f"cart pose:\ntrans:{pose[0]}, rot: {euler_from_quaternion(pose[1])}")
+        log.info(f"q: {self.q_init}")
 
-        log.info(f"Secondary initialization  {my_log.GREEN}DONE")
+        # EE frame transformation construction
+        T_trans = np.eye(4)
+        T_trans[0:3, 3] = np.array([0.23, -0.02, 0.07]).T
+
+        T_rot = np.eye(4)
+        T_rot[0:3, 0:3] = tools.get_rotation_matrix(angle=np.deg2rad(-45), axis="z")
+
+        T_new = np.matmul(T_rot, T_trans)
+        T_new = np.reshape(T_new, (16), order = 'F') # msg formaat
+
+        log.debug(f"{T_new}")
+        
+        # EE frame parameters
+        self.tool_mass = 0.76
+        # the two parameters below are not accurate
+        self.F_x_center_tool = [0.25, -0.01, 0.05]
+        self.tool_inertia = [0.001333, 0.0,     0.0,
+                             0.0,      0.00347, 0.0,
+                             0.0,      0.0,     0.00453]
+        
+        self.switch_controller(stop_controllers=self.used_controllers)
+        response = self.set_EE_load(self.tool_mass,
+                                    self.F_x_center_tool,
+                                    self.tool_inertia)
+        response = self.set_NE_T_EE_transform(NE_T_EE=T_new)
+        self.switch_controller(start_controllers=self.used_controllers)
 
     def franka_state_callback(self, msg) -> None:
         # Save the state
@@ -87,20 +114,15 @@ class PandaRobotCustom:
         # TODO prettier parsing?
         return self.state
 
-    def get_cart_pose(self, frame0=None,  frame1=None):
-        if frame0 is None:
-            frame0 = self.base_link
-        if frame1 is None:
-            frame1 = self.EE_frame
-
+    def get_cart_pose(self, frame0=BASE_LINK, frame1=EE_frame):
         if self.tf_listener.frameExists(frame0) and self.tf_listener.frameExists(frame1):
             t = self.tf_listener.getLatestCommonTime(frame0, frame1)
-            position, quaternion = self.tf_listener.lookupTransform(frame0, frame1, t)
-            log.info(f"Trans: {position}, Quat: {quaternion}")
+            trans, rot = self.tf_listener.lookupTransform(frame0, frame1, t)
+            log.info(f"Trans: {trans}, Rot: {rot}")
+            return trans, rot
         else:
             log.error(f"Transform could not be fetched ('{frame0}' to '{frame1}')")
             return None
-        return position, quaternion
 
     def set_stiffness(self, trans: float = None, rot: float = None, null: float = None):
 
@@ -119,6 +141,7 @@ class PandaRobotCustom:
             response = self.compliance_client.update_configuration(change)
             rospy.sleep(0.25)
             responses.append(response)
+        rospy.sleep(0.5)
         return responses
 
     def get_stiffness(self):
@@ -128,6 +151,7 @@ class PandaRobotCustom:
         msg = SetEEFrameRequest()
         msg.NE_T_EE = NE_T_EE
         respone = self.set_EE_frame_client.call(msg)
+        rospy.sleep(0.5)
         return respone
 
     def set_EE_load(self, mass: float = 0.0, F_x_center_load: list = [0.0, 0.0, 0.0], load_inertia: list = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) -> SetLoadResponse:
@@ -140,16 +164,14 @@ class PandaRobotCustom:
         # response has attributes:
         # success: true/false
         # error: ''
+        rospy.sleep(0.5)
         return response
 
-    def switch_controller(self, start_controllers: list = None, stop_controllers: list = None, strictness: int = BEST_EFFORT, start_asap: bool = False) -> SwitchControllerResponse:
-        if start_controllers is None and stop_controllers is None:
-            raise ValueError("Both arguments cannot be None!")
-        if start_controllers is None:
-            start_controllers = [""]
-        if stop_controllers is None:
-            stop_controllers = [""]
-
+    def switch_controller(self, start_controllers: list = [""], stop_controllers: list = [""], strictness: int = BEST_EFFORT, start_asap: bool = False) -> SwitchControllerResponse:
+        log.debug("Switching controllers")            
+        log.debug(f"Starting: {start_controllers}")
+        log.debug(f"Stopping: {stop_controllers}")
+        
         msg = SwitchControllerRequest()
         msg.start_controllers = start_controllers
         msg.stop_controllers = stop_controllers
@@ -158,6 +180,7 @@ class PandaRobotCustom:
         msg.timeout = 1.0
 
         response = self.switch_controller_proxy.call(msg)
+        rospy.sleep(0.5)
         return response
 
     def list_controllers(self) -> ListControllersResponse:
@@ -165,36 +188,28 @@ class PandaRobotCustom:
         response = self.list_controllers_proxy.call(msg)
         return response.controller  # Unpacks the actual list from msg
 
-    def cartesian_move(self, goal):
+    def cart_move(self, trans, rot):
         msg = PoseStamped()
 
         msg.header.frame_id = "/panda_link0"
         msg.header.stamp = rospy.Time.now()
 
-        msg.pose.position.x = goal[0]
-        msg.pose.position.y = goal[1]
-        msg.pose.position.z = goal[2]
+        msg.pose.position.x = trans[0]
+        msg.pose.position.y = trans[1]
+        msg.pose.position.z = trans[2]
 
-        msg.pose.orientation.x = goal[3]
-        msg.pose.orientation.y = goal[4]
-        msg.pose.orientation.z = goal[5]
-        msg.pose.orientation.w = goal[6]
+        msg.pose.orientation.x = rot[0]
+        msg.pose.orientation.y = rot[1]
+        msg.pose.orientation.z = rot[2]
+        msg.pose.orientation.w = rot[3]
 
         self.cartesian_goal_publisher.publish(msg)
 
-    def cartesian_move_smooth(self, goal):
+    def cart_move_smooth(self, goal):
         pass
 
 
 if __name__ == "__main__":
     rospy.init_node("panda_custom", anonymous=True)
     robot = PandaRobotCustom()
-    log.info(robot.get_state().NE_T_EE)
-
-    mass = 0.76
-    Fx_frame = [0.1, 0.0, 0.05]
-    inertia = [0.001333, 0.0,     0.0,
-               0.0,      0.00347, 0.0,
-               0.0,      0.0,     0.00453]
-    log.info(robot.used_controllers)
-    # response = robot.set_EE_load(mass=mass, F_x_center_load=Fx_frame, load_inertia=inertia)
+    trans, rot = robot.get_cart_pose()
