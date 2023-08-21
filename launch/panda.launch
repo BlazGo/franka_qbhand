@@ -57,8 +57,8 @@
   <rosparam file="$(find franka_gazebo)/config/sim_controllers.yaml" subst_value="true" />
   
   <!-- mass of panda gripper or qhand -->
-  <param name="m_ee" value="0.76" if="$(arg use_gripper)"/>
-  <param name="m_ee" value="3.0" if="$(arg use_qbhand)"/>
+  <param name="m_ee" value="0.76" if="$(arg use_qbhand)"/>
+  <param name="m_ee" value="3.0" if="$(arg use_gripper)"/>
 
   <arg name="unpause" value="$(eval '' if arg('paused') else '-unpause')" />
   <node name="$(arg arm_id)_model_spawner"
