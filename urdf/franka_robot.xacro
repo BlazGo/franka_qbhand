@@ -8,13 +8,18 @@
     <xacro:arg name="tcp_xyz" default="0 0 0.1034" />
     <!-- Rotational offset between $(arm_id)_hand -> $(arm_id)_hand_tcp [rad]. Only used when hand:=true -->
     <xacro:arg name="tcp_rpy" default="0 0 0" />
-    <!-- Is the robot being simulated in gazebo?" -->
+    <!-- Is the robot being simulated in gazebo? -->
     <xacro:arg name="gazebo" default="false" />
 
+    <!-- Qb hand parameters -->
+    <!-- Transform frame -->
+    <xacro:arg name="tcp_xyz_qb" default="0.1 -0.1 0.05" />
+    <xacro:arg name="tcp_rpy_qb" default="3.1416 -1.5708 -0.7854" />
+
     <xacro:include filename="$(find franka_description)/robots/common/utils.xacro" />
-    <xacro:include filename="$(find franka_description)/robots/common/franka_arm.xacro" />
+    <xacro:include filename="$(find franka_qbhand)/urdf/franka_arm.xacro" />
     
-    <xacro:franka_arm arm_id="${arm_id}" safety_distance="0.03" gazebo="$(arg gazebo)" joint_limits="${joint_limits}"/>
+    <xacro:franka_arm arm_id="${arm_id}" safety_distance="0.03" gazebo="$(arg gazebo)" joint_limits="${joint_limits}" qbhand="$(arg qbhand)" tcp_xyz_qb="$(arg tcp_xyz_qb)" tcp_rpy_qb="$(arg tcp_rpy_qb)" />
 
     <xacro:if value="$(arg hand)">
       <xacro:include filename="$(find franka_description)/robots/common/franka_hand.xacro"/>
@@ -29,12 +34,12 @@
     </xacro:if>
 
     <xacro:if value="$(arg qbhand)">
-      <xacro:include filename="$(find softhands_description)/urdf/softhands.xacro"/>
+      <xacro:include filename="$(find franka_qbhand)/urdf/softhands.xacro"/>
       <xacro:softhands type="right"
         version="v2.0_simple"
         parent="$(arg arm_id)_link8"
-        position="0.1 -0.1 0.05"
-        orientation="3.1416 -1.5708 -0.7854"
+        position="$(arg tcp_xyz_qb)"
+        orientation="$(arg tcp_rpy_qb)"
         operation_mode="0"
         translation="0.0036"/>
     </xacro:if>
