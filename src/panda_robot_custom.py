@@ -78,7 +78,7 @@ class PandaRobotCustom:
 
         # EE frame transformation construction
         T_trans = np.eye(4)
-        T_trans[0:3, 3] = np.array([0.23, -0.02, 0.07]).T
+        T_trans[0:3, 3] = np.array([0.1, -0.0, 0.0]).T
 
         T_rot = np.eye(4)
         T_rot[0:3, 0:3] = tools.get_rotation_matrix(angle=np.deg2rad(-45), axis="z")
@@ -89,18 +89,20 @@ class PandaRobotCustom:
         log.debug(f"{T_new}")
         
         # EE frame parameters
-        self.tool_mass = 0.76
+        self.tool_mass = 0.0
         # the two parameters below are not accurate
-        self.F_x_center_tool = [0.25, -0.01, 0.05]
-        self.tool_inertia = [0.001333, 0.0,     0.0,
-                             0.0,      0.00347, 0.0,
-                             0.0,      0.0,     0.00453]
+        self.F_x_center_tool = [0.0, -0.0, 0.0]
+        self.tool_inertia = [0.0, 0.0,     0.0,
+                             0.0,      0.0, 0.0,
+                             0.0,      0.0,     0.0]
         
         self.switch_controller(stop_controllers=self.used_controllers)
         response = self.set_EE_load(self.tool_mass,
                                     self.F_x_center_tool,
                                     self.tool_inertia)
+        log.info(f"Response set load: {response}")
         response = self.set_NE_T_EE_transform(NE_T_EE=T_new)
+        log.info(f"Response set EE: {response}")
         self.switch_controller(start_controllers=self.used_controllers)
 
     def franka_state_callback(self, msg) -> None:
@@ -179,7 +181,7 @@ class PandaRobotCustom:
         msg.timeout = 1.0
 
         response = self.switch_controller_proxy.call(msg)
-        rospy.sleep(0.5)
+        rospy.sleep(1.5)
         return response
 
     def list_controllers(self) -> ListControllersResponse:

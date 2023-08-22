@@ -4,10 +4,8 @@
   <xacro:include filename="$(find franka_qbhand)/urdf/franka_robot.xacro"/>
 
   <xacro:arg name="arm_id" default="panda" />
-  <xacro:arg name="qbhand" default="true" />
 
   <xacro:franka_robot arm_id="$(arg arm_id)"
-                      qbhand="$(arg qbhand)"
                       joint_limits="${xacro.load_yaml('$(find franka_description)/robots/panda/joint_limits.yaml')}">
   </xacro:franka_robot>
 

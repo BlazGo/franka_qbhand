@@ -44,7 +44,7 @@
   <xacro:include filename="$(find softhands_description)/urdf/v2.0/sh_v2.xacro"/>
   <xacro:include filename="$(find softhands_description)/urdf/v2.0_simple/sh_v2_simple.xacro"/>
 
-  <xacro:macro name="softhands" params="type version parent position orientation operation_mode translation">
+  <xacro:macro name="softhands" params="type version parent position orientation operation_mode translation gazebo:=true safety_distance:=0 description_pkg:=franka_description">
 
     # Softhand VERSION 1.0
     <xacro:if value="${version == 'v1.0'}">
@@ -85,10 +85,53 @@
     # Softhand VERSION 2.0 SIMPLIFIED (less joints)
     <xacro:if value="${version == 'v2.0_simple'}">
 
+      <link name="qbhand_flange0">
+        <visual>
+          <geometry>
+            <box size="30e-3 30e-3 30e-3" />
+          </geometry>
+        </visual>
+        <collision>
+          <origin xyz="30e-3 30e-3 30e-3" rpy="0 0 0" />
+          <geometry>
+            <box size="17.5e-3 15.2e-3 18.5e-3" />
+          </geometry>
+        </collision>
+      </link>
+
+      <link name="qbhand_flange1">
+        <visual>
+          <geometry>
+            <box size="30e-3 30e-3 30e-3" />
+          </geometry>
+        </visual>
+        <collision>
+          <origin xyz="30e-3 30e-3 30e-3" rpy="0 0 0" />
+          <geometry>
+            <box size="17.5e-3 15.2e-3 18.5e-3" />
+          </geometry>
+        </collision>
+      </link>
+
+      <!-- Create flange link -->
+      
+      <joint name="qbhand_flange_joint0" type="fixed">
+        <parent link="${parent}" />
+        <child link="qbhand_flange0" />
+        <origin xyz="0 0 0" rpy="${orientation}" />
+      </joint>
+
+      <!-- Create end flange link -->
+      <joint name="qbhand_flange_joint1" type="fixed">
+        <parent link="qbhand_flange0" />
+        <child link="qbhand_flange1" />
+        <origin xyz="${position}" rpy="0 0 0" />
+      </joint>
+
       <xacro:sh_v2_simple type="${type}" 
-	      parent = "${parent}"
-	      position ="${position}"
-	      orientation ="${orientation}"
+	      parent = "qbhand_flange1"
+	      position ="0 0 0"
+	      orientation ="3.14158 -1.5708 0"
         operation_mode = "${operation_mode}"
         translation="${translation}">
       </xacro:sh_v2_simple>	

@@ -10,8 +10,8 @@
 
   <!-- Robot Customization -->
   <arg name="arm_id"      default="panda" doc="Name of the panda robot to spawn" />
-  <arg name="use_qbhand"      default="true"  doc="Use qbhand or not" />
-  <arg name="use_gripper" default="false" doc="Should a franka hand be mounted on the flange?" />
+  <arg name="use_gripper" default="false"  doc="Should a franka hand be mounted on the flange?" />
+  <arg name="use_qbhand" default="true"  doc="Should a qband be mounted on the flange?" />
   <arg name="controller"  default="cartesian_impedance_example_controller"     doc="Which example controller should be started? (One of {cartesian_impedance,model,force,joint_position,joint_velocity}_example_controller)" />
   <arg name="x"           default="0"     doc="How far forward to place the base of the robot in [m]?" />
   <arg name="y"           default="0"     doc="How far leftwards to place the base of the robot in [m]?" />
@@ -32,7 +32,6 @@
                 -J $(arg arm_id)_finger_joint1 0.001
                 -J $(arg arm_id)_finger_joint2 0.001"
        />
-  <arg name="interactive_marker" default="$(eval arg('controller') == 'cartesian_impedance_example_controller')" doc="Should the interactive marker node be started?" />
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch" if="$(arg gazebo)">
     <arg name="world_name" value="$(arg world)"/>
@@ -46,8 +45,8 @@
          command="xacro $(find franka_qbhand)/urdf/panda.urdf.xacro
                   gazebo:=true
                   hand:=$(arg use_gripper)
-                  arm_id:=$(arg arm_id)
                   qbhand:=$(arg use_qbhand)
+                  arm_id:=$(arg arm_id)
                   xyz:='$(arg x) $(arg y) $(arg z)'
                   rpy:='$(arg roll) $(arg pitch) $(arg yaw)'
                   $(arg xacro_args)">
@@ -55,10 +54,13 @@
 
   <rosparam file="$(find franka_gazebo)/config/franka_hw_sim.yaml" subst_value="true" />
   <rosparam file="$(find franka_gazebo)/config/sim_controllers.yaml" subst_value="true" />
+
+  <param name="m_ee" value="0.76" if="$(arg use_gripper)" />
   
-  <!-- mass of panda gripper or qhand -->
-  <param name="m_ee" value="0.76" if="$(arg use_qbhand)"/>
-  <param name="m_ee" value="3.0" if="$(arg use_gripper)"/>
+  <!-- qbhand setup -->
+  <param name="m_ee" value="0.77" if="$(arg use_qbhand)" />
+  <param name="com_qb" value="0.005 -0.003 0.08"/>
+
 
   <arg name="unpause" value="$(eval '' if arg('paused') else '-unpause')" />
   <node name="$(arg arm_id)_model_spawner"
@@ -91,10 +93,7 @@
     <param name="rate" value="30"/>
   </node>
 
-  <!-- Start only if cartesian_impedance_example_controller -->
-
-  <remap to="cartesian_impedance_example_controller/equilibrium_pose" from="equilibrium_pose" />
-  
-  <node pkg="rviz" type="rviz" output="screen" name="rviz" args="-d $(find franka_qbhand)/launch/rviz/default.rviz" if="$(arg rviz)"/>
+  <remap to="cartesian_impedance_example_controller/cartesian_pose" from="equilibrium_pose" />
+  <node  pkg="rviz" type="rviz" output="screen" name="rviz" args="-d $(find franka_qbhand)/launch/rviz/default.rviz"  if="$(arg rviz)"/>
 
 </launch>

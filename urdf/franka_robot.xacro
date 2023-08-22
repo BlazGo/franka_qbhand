@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-  <xacro:macro name="franka_robot" params="arm_id qbhand joint_limits">
+  <xacro:macro name="franka_robot" params="arm_id joint_limits">
     <!-- Name of this panda -->
     <!-- Should a franka_gripper be mounted at the flange?" -->
     <xacro:arg name="hand" default="false" />
@@ -8,17 +8,17 @@
     <xacro:arg name="tcp_xyz" default="0 0 0.1034" />
     <!-- Rotational offset between $(arm_id)_hand -> $(arm_id)_hand_tcp [rad]. Only used when hand:=true -->
     <xacro:arg name="tcp_rpy" default="0 0 0" />
-    <!-- Is the robot being simulated in gazebo? -->
+    <!-- Is the robot being simulated in gazebo?" -->
     <xacro:arg name="gazebo" default="false" />
 
     <!-- Qb hand parameters -->
-    <!-- Transform frame -->
-    <xacro:arg name="tcp_xyz_qb" default="0.1 -0.1 0.05" />
-    <xacro:arg name="tcp_rpy_qb" default="3.1416 -1.5708 -0.7854" />
+    <!-- Transform frame panda_link8 -> base_link_qbhand  first rotation then translation -->
+    <xacro:arg name="tcp_xyz_qb" default="0.1 0.0 0.0" />
+    <xacro:arg name="tcp_rpy_qb" default="0.0 0.0 -0.7854" />
 
     <xacro:include filename="$(find franka_description)/robots/common/utils.xacro" />
     <xacro:include filename="$(find franka_description)/robots/common/franka_arm.xacro" />
-    
+
     <xacro:franka_arm arm_id="${arm_id}" safety_distance="0.03" gazebo="$(arg gazebo)" joint_limits="${joint_limits}"/>
 
     <xacro:if value="$(arg hand)">
@@ -30,18 +30,22 @@
           tcp_rpy="$(arg tcp_rpy)"
           connected_to="$(arg arm_id)_link8"
           safety_distance="0.03"
-          gazebo="$(arg gazebo)"/>
+          gazebo="$(arg gazebo)"
+       />
     </xacro:if>
 
     <xacro:if value="$(arg qbhand)">
       <xacro:include filename="$(find franka_qbhand)/urdf/softhands.xacro"/>
-      <xacro:softhands type="right"
+      <xacro:softhands
+        type="right"
         version="v2.0_simple"
         parent="$(arg arm_id)_link8"
         position="$(arg tcp_xyz_qb)"
         orientation="$(arg tcp_rpy_qb)"
         operation_mode="0"
-        translation="0.0036"/>
+        translation="0.0036"
+        gazebo="$(arg gazebo)"
+        />
     </xacro:if>
 
     <!-- Define additional Gazebo tags -->
