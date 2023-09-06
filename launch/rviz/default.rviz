@@ -6,7 +6,6 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /TF1
         - /TF1/Frames1
       Splitter Ratio: 0.5833333134651184
     Tree Height: 697
@@ -139,16 +138,6 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        qbhand_flange0:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        qbhand_flange1:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
         right_hand_v2s_index_distal_link:
           Alpha: 1
           Show Axes: false
@@ -263,15 +252,6 @@ Visualization Manager:
       Update Interval: 0
       Value: true
       Visual Enabled: true
-    - Class: rviz/InteractiveMarkers
-      Enable Transparency: true
-      Enabled: false
-      Name: InteractiveMarkers
-      Show Axes: false
-      Show Descriptions: true
-      Show Visual Aids: false
-      Update Topic: /equilibrium_pose_marker/update
-      Value: false
     - Class: rviz/TF
       Enabled: true
       Filter (blacklist): ""
@@ -284,9 +264,9 @@ Visualization Manager:
         panda_K:
           Value: false
         panda_NE:
-          Value: true
-        panda_link0:
           Value: false
+        panda_link0:
+          Value: true
         panda_link0_sc:
           Value: false
         panda_link1:
@@ -318,10 +298,6 @@ Visualization Manager:
         panda_link7_sc:
           Value: false
         panda_link8:
-          Value: false
-        qbhand_flange0:
-          Value: false
-        qbhand_flange1:
           Value: false
         right_hand_v2s_index_distal_link:
           Value: false
@@ -404,34 +380,32 @@ Visualization Manager:
                               panda_EE:
                                 panda_K:
                                   {}
-                            qbhand_flange0:
-                              qbhand_flange1:
-                                right_hand_v2s_palm_base:
-                                  right_hand_v2s_palm_link:
-                                    right_hand_v2s_index_knuckle_link:
-                                      right_hand_v2s_index_proximal_link:
-                                        right_hand_v2s_index_middle_link:
-                                          right_hand_v2s_index_distal_link:
-                                            {}
-                                    right_hand_v2s_little_knuckle_link:
-                                      right_hand_v2s_little_proximal_link:
-                                        right_hand_v2s_little_middle_link:
-                                          right_hand_v2s_little_distal_link:
-                                            {}
-                                    right_hand_v2s_middle_knuckle_link:
-                                      right_hand_v2s_middle_proximal_link:
-                                        right_hand_v2s_middle_middle_link:
-                                          right_hand_v2s_middle_distal_link:
-                                            {}
-                                    right_hand_v2s_ring_knuckle_link:
-                                      right_hand_v2s_ring_proximal_link:
-                                        right_hand_v2s_ring_middle_link:
-                                          right_hand_v2s_ring_distal_link:
-                                            {}
-                                    right_hand_v2s_thumb_knuckle_link:
-                                      right_hand_v2s_thumb_proximal_link:
-                                        right_hand_v2s_thumb_distal_link:
-                                          {}
+                            right_hand_v2s_palm_base:
+                              right_hand_v2s_palm_link:
+                                right_hand_v2s_index_knuckle_link:
+                                  right_hand_v2s_index_proximal_link:
+                                    right_hand_v2s_index_middle_link:
+                                      right_hand_v2s_index_distal_link:
+                                        {}
+                                right_hand_v2s_little_knuckle_link:
+                                  right_hand_v2s_little_proximal_link:
+                                    right_hand_v2s_little_middle_link:
+                                      right_hand_v2s_little_distal_link:
+                                        {}
+                                right_hand_v2s_middle_knuckle_link:
+                                  right_hand_v2s_middle_proximal_link:
+                                    right_hand_v2s_middle_middle_link:
+                                      right_hand_v2s_middle_distal_link:
+                                        {}
+                                right_hand_v2s_ring_knuckle_link:
+                                  right_hand_v2s_ring_proximal_link:
+                                    right_hand_v2s_ring_middle_link:
+                                      right_hand_v2s_ring_distal_link:
+                                        {}
+                                right_hand_v2s_thumb_knuckle_link:
+                                  right_hand_v2s_thumb_proximal_link:
+                                    right_hand_v2s_thumb_distal_link:
+                                      {}
       Update Interval: 0
       Value: true
   Enabled: true
@@ -462,7 +436,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.5731868743896484
+      Distance: 1.9226609468460083
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -470,17 +444,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.10584437847137451
-        Y: 0.15923181176185608
-        Z: 0.26979008316993713
+        X: 0.14199621975421906
+        Y: 0.12422122806310654
+        Z: 0.28438058495521545
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6553980708122253
+      Pitch: 0.20039814710617065
       Target Frame: <Fixed Frame>
-      Yaw: 5.893587112426758
+      Yaw: 4.693569660186768
     Saved: ~
 Window Geometry:
   Displays:
