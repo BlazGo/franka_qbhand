@@ -35,8 +35,8 @@
         type = "right"
         version = "v2.0_simple"
         parent = "panda_link8"
-        position ="0 0 0"
-        orientation ="0 0 0"
+        position ="0.12 0 0.05"
+        orientation ="0 -1.5707963 2.3561944"
         operation_mode = "0"
         translation="0.0036"
       />

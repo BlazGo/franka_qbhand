@@ -1,0 +1,2619 @@
+<sdf version='1.7'>
+  <world name='default'>
+    <light name='sun' type='directional'>
+      <cast_shadows>1</cast_shadows>
+      <pose>0 0 10 0 -0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>0</outer_angle>
+        <falloff>0</falloff>
+      </spot>
+    </light>
+    <model name='ground_plane'>
+      <static>1</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <surface>
+            <contact>
+              <collide_bitmask>65535</collide_bitmask>
+              <ode/>
+            </contact>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>50</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='visual'>
+          <cast_shadows>0</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <gravity>0 0 -9.8</gravity>
+    <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+    <atmosphere type='adiabatic'/>
+    <physics type='ode'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+    <scene>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+      <shadows>1</shadows>
+    </scene>
+    <wind/>
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>0</latitude_deg>
+      <longitude_deg>0</longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+    <model name='panda'>
+      <joint name='world_joint' type='fixed'>
+        <pose relative_to='__model__'>0 0 0 0 -0 0</pose>
+        <parent>world</parent>
+        <child>panda_link0</child>
+      </joint>
+      <link name='panda_link0'>
+        <pose relative_to='world_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>-0.041018 -0.00014 0.049974 0 -0 0</pose>
+          <mass>0.629769</mass>
+          <inertia>
+            <ixx>0.00315</ixx>
+            <ixy>8.2904e-07</ixy>
+            <ixz>0.00015</ixz>
+            <iyy>0.00388</iyy>
+            <iyz>8.2299e-06</iyz>
+            <izz>0.004285</izz>
+          </inertia>
+        </inertial>
+        <collision name='panda_link0_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/opt/ros/noetic/share/franka_description/meshes/collision/link0.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='panda_link0_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/opt/ros/noetic/share/franka_description/meshes/visual/link0.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='panda_joint1' type='revolute'>
+        <pose relative_to='panda_link0'>0 0 0.333 0 -0 0</pose>
+        <parent>panda_link0</parent>
+        <child>panda_link1</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-2.8973</lower>
+            <upper>2.8973</upper>
+            <effort>87</effort>
+            <velocity>2.175</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.003</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <limit>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </limit>
+            <provide_feedback>1</provide_feedback>
+          </ode>
+          <provide_feedback>1</provide_feedback>
+        </physics>
+      </joint>
+      <link name='panda_link1'>
+        <pose relative_to='panda_joint1'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.003875 0.002081 -0.04762 0 -0 0</pose>
+          <mass>4.97068</mass>
+          <inertia>
+            <ixx>0.70337</ixx>
+            <ixy>-0.000139</ixy>
+            <ixz>0.006772</ixz>
+            <iyy>0.70661</iyy>
+            <iyz>0.019169</iyz>
+            <izz>0.009117</izz>
+          </inertia>
+        </inertial>
+        <collision name='panda_link1_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/opt/ros/noetic/share/franka_description/meshes/collision/link1.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='panda_link1_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/opt/ros/noetic/share/franka_description/meshes/visual/link1.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='panda_joint2' type='revolute'>
+        <pose relative_to='panda_link1'>0 0 0 -1.5708 0 0</pose>
+        <parent>panda_link1</parent>
+        <child>panda_link2</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-1.7628</lower>
+            <upper>1.7628</upper>
+            <effort>87</effort>
+            <velocity>2.175</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.003</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <limit>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </limit>
+            <provide_feedback>1</provide_feedback>
+          </ode>
+          <provide_feedback>1</provide_feedback>
+        </physics>
+      </joint>
+      <link name='panda_link2'>
+        <pose relative_to='panda_joint2'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>-0.003141 -0.02872 0.003495 0 -0 0</pose>
+          <mass>0.646926</mass>
+          <inertia>
+            <ixx>0.007962</ixx>
+            <ixy>-0.003925</ixy>
+            <ixz>0.010254</ixz>
+            <iyy>0.02811</iyy>
+            <iyz>0.000704</iyz>
+            <izz>0.025995</izz>
+          </inertia>
+        </inertial>
+        <collision name='panda_link2_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/opt/ros/noetic/share/franka_description/meshes/collision/link2.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='panda_link2_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/opt/ros/noetic/share/franka_description/meshes/visual/link2.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='panda_joint3' type='revolute'>
+        <pose relative_to='panda_link2'>0 -0.316 0 1.5708 -0 0</pose>
+        <parent>panda_link2</parent>
+        <child>panda_link3</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-2.8973</lower>
+            <upper>2.8973</upper>
+            <effort>87</effort>
+            <velocity>2.175</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.003</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <limit>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </limit>
+            <provide_feedback>1</provide_feedback>
+          </ode>
+          <provide_feedback>1</provide_feedback>
+        </physics>
+      </joint>
+      <link name='panda_link3'>
+        <pose relative_to='panda_joint3'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.027518 0.039252 -0.066502 0 -0 0</pose>
+          <mass>3.2286</mass>
+          <inertia>
+            <ixx>0.037242</ixx>
+            <ixy>-0.004761</ixy>
+            <ixz>-0.011396</ixz>
+            <iyy>0.036155</iyy>
+            <iyz>-0.012805</iyz>
+            <izz>0.01083</izz>
+          </inertia>
+        </inertial>
+        <collision name='panda_link3_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/opt/ros/noetic/share/franka_description/meshes/collision/link3.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='panda_link3_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/opt/ros/noetic/share/franka_description/meshes/visual/link3.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='panda_joint4' type='revolute'>
+        <pose relative_to='panda_link3'>0.0825 0 0 1.5708 -0 0</pose>
+        <parent>panda_link3</parent>
+        <child>panda_link4</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-3.0718</lower>
+            <upper>-0.0698</upper>
+            <effort>87</effort>
+            <velocity>2.175</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.003</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <limit>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </limit>
+            <provide_feedback>1</provide_feedback>
+          </ode>
+          <provide_feedback>1</provide_feedback>
+        </physics>
+      </joint>
+      <link name='panda_link4'>
+        <pose relative_to='panda_joint4'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>-0.05317 0.104419 0.027454 0 -0 0</pose>
+          <mass>3.5879</mass>
+          <inertia>
+            <ixx>0.025853</ixx>
+            <ixy>0.007796</ixy>
+            <ixz>-0.001332</ixz>
+            <iyy>0.019552</iyy>
+            <iyz>0.008641</iyz>
+            <izz>0.028323</izz>
+          </inertia>
+        </inertial>
+        <collision name='panda_link4_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/opt/ros/noetic/share/franka_description/meshes/collision/link4.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='panda_link4_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/opt/ros/noetic/share/franka_description/meshes/visual/link4.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='panda_joint5' type='revolute'>
+        <pose relative_to='panda_link4'>-0.0825 0.384 0 -1.5708 0 0</pose>
+        <parent>panda_link4</parent>
+        <child>panda_link5</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-2.8973</lower>
+            <upper>2.8973</upper>
+            <effort>12</effort>
+            <velocity>2.61</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.003</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <limit>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </limit>
+            <provide_feedback>1</provide_feedback>
+          </ode>
+          <provide_feedback>1</provide_feedback>
+        </physics>
+      </joint>
+      <link name='panda_link5'>
+        <pose relative_to='panda_joint5'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>-0.011953 0.041065 -0.038437 0 -0 0</pose>
+          <mass>1.22595</mass>
+          <inertia>
+            <ixx>0.035549</ixx>
+            <ixy>-0.002117</ixy>
+            <ixz>-0.004037</ixz>
+            <iyy>0.029474</iyy>
+            <iyz>0.000229</iyz>
+            <izz>0.008627</izz>
+          </inertia>
+        </inertial>
+        <collision name='panda_link5_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/opt/ros/noetic/share/franka_description/meshes/collision/link5.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='panda_link5_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/opt/ros/noetic/share/franka_description/meshes/visual/link5.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='panda_joint6' type='revolute'>
+        <pose relative_to='panda_link5'>0 0 0 1.5708 -0 0</pose>
+        <parent>panda_link5</parent>
+        <child>panda_link6</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.0175</lower>
+            <upper>3.7525</upper>
+            <effort>12</effort>
+            <velocity>2.61</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.003</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <limit>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </limit>
+            <provide_feedback>1</provide_feedback>
+          </ode>
+          <provide_feedback>1</provide_feedback>
+        </physics>
+      </joint>
+      <link name='panda_link6'>
+        <pose relative_to='panda_joint6'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.060149 -0.014117 -0.010517 0 -0 0</pose>
+          <mass>1.66656</mass>
+          <inertia>
+            <ixx>0.001964</ixx>
+            <ixy>0.000109</ixy>
+            <ixz>-0.001158</ixz>
+            <iyy>0.004354</iyy>
+            <iyz>0.000341</iyz>
+            <izz>0.005433</izz>
+          </inertia>
+        </inertial>
+        <collision name='panda_link6_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/opt/ros/noetic/share/franka_description/meshes/collision/link6.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='panda_link6_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/opt/ros/noetic/share/franka_description/meshes/visual/link6.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='panda_joint7' type='revolute'>
+        <pose relative_to='panda_link6'>0.088 0 0 1.5708 -0 0</pose>
+        <parent>panda_link6</parent>
+        <child>panda_link7</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-2.8973</lower>
+            <upper>2.8973</upper>
+            <effort>12</effort>
+            <velocity>2.61</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.003</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <limit>
+              <cfm>0</cfm>
+              <erp>0.2</erp>
+            </limit>
+            <provide_feedback>1</provide_feedback>
+          </ode>
+          <provide_feedback>1</provide_feedback>
+        </physics>
+      </joint>
+      <link name='panda_link7'>
+        <pose relative_to='panda_joint7'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.015068 -0.001314 0.072442 0 -0 0</pose>
+          <mass>1.00152</mass>
+          <inertia>
+            <ixx>0.0138656</ixx>
+            <ixy>-0.000465025</ixy>
+            <ixz>-0.0013327</ixz>
+            <iyy>0.0114101</iyy>
+            <iyz>-0.000829226</iyz>
+            <izz>0.00589626</izz>
+          </inertia>
+        </inertial>
+        <collision name='panda_link7_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/opt/ros/noetic/share/franka_description/meshes/collision/link7.stl</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <collision name='panda_link7_fixed_joint_lump__right_hand_v2s_palm_link_collision_1'>
+          <pose>0 0 0.107 -3e-06 -1.57079 3.14159</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/qbh_palm_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='panda_link7_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>/opt/ros/noetic/share/franka_description/meshes/visual/link7.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <visual name='panda_link7_fixed_joint_lump__right_hand_v2s_palm_link_visual_1'>
+          <pose>0 0 0.107 -3e-06 -1.57079 3.14159</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/qbh_palm_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+      <joint name='right_hand_v2s_index_knuckle_joint' type='revolute'>
+        <pose relative_to='panda_link7'>0.007582 0.0255 0.206006 1.56621 -1.39626 1.57531</pose>
+        <parent>panda_link7</parent>
+        <child>right_hand_v2s_index_knuckle_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.1</lower>
+            <upper>0.1</upper>
+            <effort>30</effort>
+            <velocity>1</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.05</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='right_hand_v2s_index_knuckle_link'>
+        <pose relative_to='right_hand_v2s_index_knuckle_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.001286 0 0.000425 0 -0 0</pose>
+          <mass>0.009</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='right_hand_v2s_index_knuckle_link_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/qbh_prossimal_std_r_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>10000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='right_hand_v2s_index_knuckle_link_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/qbh_prossimal_std_r_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.133</mu>
+              <mu2>0.133</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </link>
+      <joint name='right_hand_v2s_index_proximal_joint' type='revolute'>
+        <pose relative_to='right_hand_v2s_index_knuckle_link'>0.0211 0.0023 0.0036 1.5708 -0 0</pose>
+        <parent>right_hand_v2s_index_knuckle_link</parent>
+        <child>right_hand_v2s_index_proximal_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.785398</lower>
+            <upper>1.57</upper>
+            <effort>30</effort>
+            <velocity>1</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.05</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='right_hand_v2s_index_proximal_link'>
+        <pose relative_to='right_hand_v2s_index_proximal_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.011574 -0.0036 0 0 -0 0</pose>
+          <mass>0.005</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='right_hand_v2s_index_proximal_link_collision'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/phalanx_std_ng_collision.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>10000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='right_hand_v2s_index_proximal_link_visual'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/phalanx_std_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.133</mu>
+              <mu2>0.133</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </link>
+      <joint name='right_hand_v2s_index_middle_joint' type='revolute'>
+        <pose relative_to='right_hand_v2s_index_proximal_link'>0.022 0 0 0 -0 0</pose>
+        <parent>right_hand_v2s_index_proximal_link</parent>
+        <child>right_hand_v2s_index_middle_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.785398</lower>
+            <upper>1.57</upper>
+            <effort>30</effort>
+            <velocity>1</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.05</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='right_hand_v2s_index_middle_link'>
+        <pose relative_to='right_hand_v2s_index_middle_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.011574 -0.0036 0 0 -0 0</pose>
+          <mass>0.005</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='right_hand_v2s_index_middle_link_collision'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/phalanx_std_ng_collision.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>10000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='right_hand_v2s_index_middle_link_visual'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/phalanx_std_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.133</mu>
+              <mu2>0.133</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </link>
+      <joint name='right_hand_v2s_index_distal_joint' type='revolute'>
+        <pose relative_to='right_hand_v2s_index_middle_link'>0.022 0 0 0 -0 0</pose>
+        <parent>right_hand_v2s_index_middle_link</parent>
+        <child>right_hand_v2s_index_distal_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.785398</lower>
+            <upper>1.57</upper>
+            <effort>30</effort>
+            <velocity>1</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.05</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='right_hand_v2s_index_distal_link'>
+        <pose relative_to='right_hand_v2s_index_distal_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.011574 -0.0036 0 0 -0 0</pose>
+          <mass>0.005</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='right_hand_v2s_index_distal_link_collision'>
+          <pose>0.0065 0 0 0 -0.0036 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/qb_distal_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>10000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='right_hand_v2s_index_distal_link_visual'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/qb_distal_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.133</mu>
+              <mu2>0.133</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </link>
+      <joint name='right_hand_v2s_little_knuckle_joint' type='revolute'>
+        <pose relative_to='panda_link7'>0.007586 -0.0257 0.201006 -1.56772 -1.309 -1.57377</pose>
+        <parent>panda_link7</parent>
+        <child>right_hand_v2s_little_knuckle_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.1</lower>
+            <upper>0.1</upper>
+            <effort>30</effort>
+            <velocity>1</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.05</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='right_hand_v2s_little_knuckle_link'>
+        <pose relative_to='right_hand_v2s_little_knuckle_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.001286 0 0.000425 0 -0 0</pose>
+          <mass>0.009</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='right_hand_v2s_little_knuckle_link_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/qbh_prossimal_std_l_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>10000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='right_hand_v2s_little_knuckle_link_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/qbh_prossimal_std_l_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.133</mu>
+              <mu2>0.133</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </link>
+      <joint name='right_hand_v2s_little_proximal_joint' type='revolute'>
+        <pose relative_to='right_hand_v2s_little_knuckle_link'>0.0211 -0.0023 0.0036 1.5708 -0 0</pose>
+        <parent>right_hand_v2s_little_knuckle_link</parent>
+        <child>right_hand_v2s_little_proximal_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.785398</lower>
+            <upper>1.57</upper>
+            <effort>30</effort>
+            <velocity>1</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.05</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='right_hand_v2s_little_proximal_link'>
+        <pose relative_to='right_hand_v2s_little_proximal_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.011574 -0.0036 0 0 -0 0</pose>
+          <mass>0.005</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='right_hand_v2s_little_proximal_link_collision'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/phalanx_std_ng_collision.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>10000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='right_hand_v2s_little_proximal_link_visual'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/phalanx_std_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.133</mu>
+              <mu2>0.133</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </link>
+      <joint name='right_hand_v2s_little_middle_joint' type='revolute'>
+        <pose relative_to='right_hand_v2s_little_proximal_link'>0.022 0 0 0 -0 0</pose>
+        <parent>right_hand_v2s_little_proximal_link</parent>
+        <child>right_hand_v2s_little_middle_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.785398</lower>
+            <upper>1.57</upper>
+            <effort>30</effort>
+            <velocity>1</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.05</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='right_hand_v2s_little_middle_link'>
+        <pose relative_to='right_hand_v2s_little_middle_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.011574 -0.0036 0 0 -0 0</pose>
+          <mass>0.005</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='right_hand_v2s_little_middle_link_collision'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/phalanx_std_ng_collision.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>10000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='right_hand_v2s_little_middle_link_visual'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/phalanx_std_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.133</mu>
+              <mu2>0.133</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </link>
+      <joint name='right_hand_v2s_little_distal_joint' type='revolute'>
+        <pose relative_to='right_hand_v2s_little_middle_link'>0.022 0 0 0 -0 0</pose>
+        <parent>right_hand_v2s_little_middle_link</parent>
+        <child>right_hand_v2s_little_distal_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.785398</lower>
+            <upper>1.57</upper>
+            <effort>30</effort>
+            <velocity>1</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.05</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='right_hand_v2s_little_distal_link'>
+        <pose relative_to='right_hand_v2s_little_distal_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.011574 -0.0036 0 0 -0 0</pose>
+          <mass>0.005</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='right_hand_v2s_little_distal_link_collision'>
+          <pose>0.0065 0 0 0 -0.0036 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/qb_distal_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>10000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='right_hand_v2s_little_distal_link_visual'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/qb_distal_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.133</mu>
+              <mu2>0.133</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </link>
+      <joint name='right_hand_v2s_middle_knuckle_joint' type='revolute'>
+        <pose relative_to='panda_link7'>0.007578 0.0075 0.211006 0 -1.57 3.14159</pose>
+        <parent>panda_link7</parent>
+        <child>right_hand_v2s_middle_knuckle_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.1</lower>
+            <upper>0.1</upper>
+            <effort>30</effort>
+            <velocity>1</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.05</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='right_hand_v2s_middle_knuckle_link'>
+        <pose relative_to='right_hand_v2s_middle_knuckle_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.001286 0 0.000425 0 -0 0</pose>
+          <mass>0.009</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='right_hand_v2s_middle_knuckle_link_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/qbh_prossimal_std_m_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>10000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='right_hand_v2s_middle_knuckle_link_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/qbh_prossimal_std_m_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.133</mu>
+              <mu2>0.133</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </link>
+      <joint name='right_hand_v2s_middle_proximal_joint' type='revolute'>
+        <pose relative_to='right_hand_v2s_middle_knuckle_link'>0.0211 0 0.0036 1.5708 -0 0</pose>
+        <parent>right_hand_v2s_middle_knuckle_link</parent>
+        <child>right_hand_v2s_middle_proximal_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.785398</lower>
+            <upper>1.57</upper>
+            <effort>30</effort>
+            <velocity>1</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.05</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='right_hand_v2s_middle_proximal_link'>
+        <pose relative_to='right_hand_v2s_middle_proximal_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.011574 -0.0036 0 0 -0 0</pose>
+          <mass>0.005</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='right_hand_v2s_middle_proximal_link_collision'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/phalanx_std_ng_collision.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>10000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='right_hand_v2s_middle_proximal_link_visual'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/phalanx_std_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.133</mu>
+              <mu2>0.133</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </link>
+      <joint name='right_hand_v2s_middle_middle_joint' type='revolute'>
+        <pose relative_to='right_hand_v2s_middle_proximal_link'>0.022 0 0 0 -0 0</pose>
+        <parent>right_hand_v2s_middle_proximal_link</parent>
+        <child>right_hand_v2s_middle_middle_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.785398</lower>
+            <upper>1.57</upper>
+            <effort>30</effort>
+            <velocity>1</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.05</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='right_hand_v2s_middle_middle_link'>
+        <pose relative_to='right_hand_v2s_middle_middle_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.011574 -0.0036 0 0 -0 0</pose>
+          <mass>0.005</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='right_hand_v2s_middle_middle_link_collision'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/phalanx_std_ng_collision.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>10000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='right_hand_v2s_middle_middle_link_visual'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/phalanx_std_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.133</mu>
+              <mu2>0.133</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </link>
+      <joint name='right_hand_v2s_middle_distal_joint' type='revolute'>
+        <pose relative_to='right_hand_v2s_middle_middle_link'>0.022 0 0 0 -0 0</pose>
+        <parent>right_hand_v2s_middle_middle_link</parent>
+        <child>right_hand_v2s_middle_distal_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.785398</lower>
+            <upper>1.57</upper>
+            <effort>30</effort>
+            <velocity>1</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.05</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='right_hand_v2s_middle_distal_link'>
+        <pose relative_to='right_hand_v2s_middle_distal_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.011574 -0.0036 0 0 -0 0</pose>
+          <mass>0.005</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='right_hand_v2s_middle_distal_link_collision'>
+          <pose>0.0065 0 0 0 -0.0036 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/qb_distal_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>10000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='right_hand_v2s_middle_distal_link_visual'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/qb_distal_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.133</mu>
+              <mu2>0.133</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </link>
+      <joint name='right_hand_v2s_ring_knuckle_joint' type='revolute'>
+        <pose relative_to='panda_link7'>0.007582 -0.0105 0.206006 -1.56166 -1.48353 -1.5799</pose>
+        <parent>panda_link7</parent>
+        <child>right_hand_v2s_ring_knuckle_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.1</lower>
+            <upper>0.1</upper>
+            <effort>30</effort>
+            <velocity>1</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.05</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='right_hand_v2s_ring_knuckle_link'>
+        <pose relative_to='right_hand_v2s_ring_knuckle_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.001286 0 0.000425 0 -0 0</pose>
+          <mass>0.009</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='right_hand_v2s_ring_knuckle_link_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/qbh_prossimal_std_l_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>10000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='right_hand_v2s_ring_knuckle_link_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/qbh_prossimal_std_l_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.133</mu>
+              <mu2>0.133</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </link>
+      <joint name='right_hand_v2s_ring_proximal_joint' type='revolute'>
+        <pose relative_to='right_hand_v2s_ring_knuckle_link'>0.0211 -0.0023 0.0036 1.5708 -0 0</pose>
+        <parent>right_hand_v2s_ring_knuckle_link</parent>
+        <child>right_hand_v2s_ring_proximal_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.785398</lower>
+            <upper>1.57</upper>
+            <effort>30</effort>
+            <velocity>1</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.05</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='right_hand_v2s_ring_proximal_link'>
+        <pose relative_to='right_hand_v2s_ring_proximal_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.011574 -0.0036 0 0 -0 0</pose>
+          <mass>0.005</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='right_hand_v2s_ring_proximal_link_collision'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/phalanx_std_ng_collision.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>10000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='right_hand_v2s_ring_proximal_link_visual'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/phalanx_std_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.133</mu>
+              <mu2>0.133</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </link>
+      <joint name='right_hand_v2s_ring_middle_joint' type='revolute'>
+        <pose relative_to='right_hand_v2s_ring_proximal_link'>0.022 0 0 0 -0 0</pose>
+        <parent>right_hand_v2s_ring_proximal_link</parent>
+        <child>right_hand_v2s_ring_middle_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.785398</lower>
+            <upper>1.57</upper>
+            <effort>30</effort>
+            <velocity>1</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.05</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='right_hand_v2s_ring_middle_link'>
+        <pose relative_to='right_hand_v2s_ring_middle_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.011574 -0.0036 0 0 -0 0</pose>
+          <mass>0.005</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='right_hand_v2s_ring_middle_link_collision'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/phalanx_std_ng_collision.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>10000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='right_hand_v2s_ring_middle_link_visual'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/phalanx_std_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.133</mu>
+              <mu2>0.133</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </link>
+      <joint name='right_hand_v2s_ring_distal_joint' type='revolute'>
+        <pose relative_to='right_hand_v2s_ring_middle_link'>0.022 0 0 0 -0 0</pose>
+        <parent>right_hand_v2s_ring_middle_link</parent>
+        <child>right_hand_v2s_ring_distal_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.785398</lower>
+            <upper>1.57</upper>
+            <effort>30</effort>
+            <velocity>1</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.05</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='right_hand_v2s_ring_distal_link'>
+        <pose relative_to='right_hand_v2s_ring_distal_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.011574 -0.0036 0 0 -0 0</pose>
+          <mass>0.005</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='right_hand_v2s_ring_distal_link_collision'>
+          <pose>0.0065 0 0 0 -0.0036 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/qb_distal_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>10000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='right_hand_v2s_ring_distal_link_visual'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/qb_distal_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.133</mu>
+              <mu2>0.133</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </link>
+      <joint name='right_hand_v2s_thumb_knuckle_joint' type='revolute'>
+        <pose relative_to='panda_link7'>0.020947 0.04371 0.173447 0.355467 -0.392971 0.799526</pose>
+        <parent>panda_link7</parent>
+        <child>right_hand_v2s_thumb_knuckle_link</child>
+        <axis>
+          <xyz>0 0 -1</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>1.57</upper>
+            <effort>30</effort>
+            <velocity>1</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.05</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='right_hand_v2s_thumb_knuckle_link'>
+        <pose relative_to='right_hand_v2s_thumb_knuckle_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 -0 0</pose>
+          <mass>0.009</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='right_hand_v2s_thumb_knuckle_link_collision'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/qbh_prox_thumb_ng_collision.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>10000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='right_hand_v2s_thumb_knuckle_link_visual'>
+          <pose>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/qbh_prox_thumb_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.133</mu>
+              <mu2>0.133</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </link>
+      <joint name='right_hand_v2s_thumb_proximal_joint' type='revolute'>
+        <pose relative_to='right_hand_v2s_thumb_knuckle_link'>0.0235 -0.003431 0.007522 1.65806 -0.3 0</pose>
+        <parent>right_hand_v2s_thumb_knuckle_link</parent>
+        <child>right_hand_v2s_thumb_proximal_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.785398</lower>
+            <upper>1.57</upper>
+            <effort>30</effort>
+            <velocity>1</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.05</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='right_hand_v2s_thumb_proximal_link'>
+        <pose relative_to='right_hand_v2s_thumb_proximal_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.011574 -0.0036 0 0 -0 0</pose>
+          <mass>0.05</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='right_hand_v2s_thumb_proximal_link_collision'>
+          <pose>0.0065 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/phalanx_std_ng_collision.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>10000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='right_hand_v2s_thumb_proximal_link_visual'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/phalanx_std_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.133</mu>
+              <mu2>0.133</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </link>
+      <joint name='right_hand_v2s_thumb_distal_joint' type='revolute'>
+        <pose relative_to='right_hand_v2s_thumb_proximal_link'>0.022 0 0 0 -0 0.3</pose>
+        <parent>right_hand_v2s_thumb_proximal_link</parent>
+        <child>right_hand_v2s_thumb_distal_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-0.785398</lower>
+            <upper>1.57</upper>
+            <effort>30</effort>
+            <velocity>1</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.05</damping>
+            <friction>0</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+      <link name='right_hand_v2s_thumb_distal_link'>
+        <pose relative_to='right_hand_v2s_thumb_distal_joint'>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0.011574 -0.0036 0 0 -0 0</pose>
+          <mass>0.05</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.001</iyy>
+            <iyz>0</iyz>
+            <izz>0.001</izz>
+          </inertia>
+        </inertial>
+        <collision name='right_hand_v2s_thumb_distal_link_collision'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/qb_distal_ng_collision.stl</uri>
+            </mesh>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <kp>10000</kp>
+                <kd>100</kd>
+              </ode>
+            </contact>
+            <friction>
+              <ode/>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='right_hand_v2s_thumb_distal_link_visual'>
+          <pose>0.0065 -0.0036 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>0.001 0.001 0.001</scale>
+              <uri>/home/bg/catkin_ws/src/SoftHand-Plugin/softhands_description/meshes/softhands/v2.0/right/qb_distal_ng.stl</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+        <self_collide>1</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.133</mu>
+              <mu2>0.133</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </link>
+      <plugin name='synergy_plugin' filename='libsofthand_plugin.so'>
+        <namespace>right_hand_v2s</namespace>
+        <operation_mode>0</operation_mode>
+        <r_finger>0.0033</r_finger>
+        <R_pulley>0.0053</R_pulley>
+        <n_param>0.058</n_param>
+        <spring_k>0.5</spring_k>
+        <synS_thumb_j1>1.2</synS_thumb_j1>
+        <synS_thumb_j2>1.2</synS_thumb_j2>
+        <synS_thumb_j3>1.2</synS_thumb_j3>
+        <k_thumb_j1>0.8</k_thumb_j1>
+        <k_thumb_j2>0.8</k_thumb_j2>
+        <k_thumb_j3>0.8</k_thumb_j3>
+        <synS_index_j2>1.57</synS_index_j2>
+        <synS_index_j3>1.25</synS_index_j3>
+        <synS_index_j4>0.8</synS_index_j4>
+        <k_index_j1>0.25</k_index_j1>
+        <k_index_j2>0.5</k_index_j2>
+        <k_index_j3>0.5</k_index_j3>
+        <k_index_j4>0.5</k_index_j4>
+        <synS_middle_j2>1.57</synS_middle_j2>
+        <synS_middle_j3>1.25</synS_middle_j3>
+        <synS_middle_j4>1.25</synS_middle_j4>
+        <k_middle_j1>0.25</k_middle_j1>
+        <k_middle_j2>0.5</k_middle_j2>
+        <k_middle_j3>0.5</k_middle_j3>
+        <k_middle_j4>0.5</k_middle_j4>
+        <synS_ring_j2>1.57</synS_ring_j2>
+        <synS_ring_j3>1.0</synS_ring_j3>
+        <synS_ring_j4>1.0</synS_ring_j4>
+        <k_ring_j1>0.25</k_ring_j1>
+        <k_ring_j2>0.5</k_ring_j2>
+        <k_ring_j3>0.5</k_ring_j3>
+        <k_ring_j4>0.5</k_ring_j4>
+        <synS_little_j2>1.57</synS_little_j2>
+        <synS_little_j3>1.25</synS_little_j3>
+        <synS_little_j4>1.0</synS_little_j4>
+        <k_little_j1>0.25</k_little_j1>
+        <k_little_j2>0.5</k_little_j2>
+        <k_little_j3>0.5</k_little_j3>
+        <k_little_j4>0.5</k_little_j4>
+        <synS_index_j1>0.3</synS_index_j1>
+        <synS_middle_j1>0</synS_middle_j1>
+        <synS_ring_j1>0</synS_ring_j1>
+        <synS_little_j1>-0.2</synS_little_j1>
+        <robotNamespace>/</robotNamespace>
+      </plugin>
+      <self_collide>1</self_collide>
+      <static>0</static>
+      <plugin name='gazebo_ros_control' filename='libgazebo_ros_control.so'>
+        <controlPeriod>0.001</controlPeriod>
+        <robotSimType>franka_gazebo/FrankaHWSim</robotSimType>
+        <robotNamespace>/</robotNamespace>
+      </plugin>
+      <self_collide>1</self_collide>
+      <pose>0 0 0 0 -0 0</pose>
+    </model>
+    <state world_name='default'>
+      <sim_time>49 235000000</sim_time>
+      <real_time>65 145327917</real_time>
+      <wall_time>1694024275 416572901</wall_time>
+      <iterations>49235</iterations>
+      <model name='ground_plane'>
+        <pose>0 0 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose>0 0 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='panda'>
+        <pose>1e-06 -0 1.7e-05 -0.000103 -7.4e-05 8e-06</pose>
+        <scale>1 1 1</scale>
+        <link name='panda_link0'>
+          <pose>1e-06 -0 1.7e-05 -0.000103 -7.4e-05 8e-06</pose>
+          <velocity>5e-06 4e-06 -0.002927 0.041611 0.016482 4.8e-05</velocity>
+          <acceleration>1.61651 -4.30365 -3.86603 2.7711 -1.19047 -2.32446</acceleration>
+          <wrench>1.01803 -2.7103 -2.43471 0 -0 0</wrench>
+        </link>
+        <link name='panda_link1'>
+          <pose>-1.1e-05 2.1e-05 0.33301 -6.9e-05 6.2e-05 0.003794</pose>
+          <velocity>0.000135 -0.001776 -0.001692 0.000508 -0.005124 0.001943</velocity>
+          <acceleration>2.30317 -4.59923 -3.22203 -2.25528 1.19708 -1.25243</acceleration>
+          <wrench>11.4483 -22.8613 -16.0157 0 -0 0</wrench>
+        </link>
+        <link name='panda_link2'>
+          <pose>-1.1e-05 2.1e-05 0.33301 -1.5709 -0.774988 0.003866</pose>
+          <velocity>0.000157 -0.001614 -0.001693 0.001885 0.003208 0.001854</velocity>
+          <acceleration>2.11851 -4.27471 -3.21479 -1.80195 0.979176 0.288106</acceleration>
+          <wrench>1.37052 -2.76542 -2.07973 0 -0 0</wrench>
+        </link>
+        <link name='panda_link3'>
+          <pose>-0.221112 -0.000786 0.558765 0.008763 -0.774958 -0.008798</pose>
+          <velocity>8.5e-05 -0.000277 -5.3e-05 -0.004183 0.005526 4.6e-05</velocity>
+          <acceleration>0.75909 -0.904678 -2.03562 -1.8532 0.975978 1.88465</acceleration>
+          <wrench>2.4508 -2.92084 -6.5722 0 -0 0</wrench>
+        </link>
+        <link name='panda_link4'>
+          <pose>-0.162169 -0.001304 0.616489 1.74341 1.53435 0.169876</pose>
+          <velocity>0.000216 -8.7e-05 -0.000402 -0.002994 -0.001448 -0.000711</velocity>
+          <acceleration>0.474565 0.102249 -0.872563 0.410769 -0.060335 3.07705</acceleration>
+          <wrench>1.70269 0.366858 -3.13067 0 -0 0</wrench>
+        </link>
+        <link name='panda_link5'>
+          <pose>0.218619 -0.002907 0.712719 0.694757 1.52404 0.692445</pose>
+          <velocity>6.4e-05 -4e-05 0.000116 -2.1e-05 -0.001091 -0.000303</velocity>
+          <acceleration>0.285331 -0.091428 0.245108 -0.935912 -1.41598 1.47228</acceleration>
+          <wrench>0.349802 -0.112086 0.30049 0 -0 0</wrench>
+        </link>
+        <link name='panda_link6'>
+          <pose>0.218619 -0.002907 0.712719 1.60072 -0.000489 -0.001793</pose>
+          <velocity>4.8e-05 -2.2e-05 0.000101 6.9e-05 0.001159 -0.000257</velocity>
+          <acceleration>0.243399 -0.137085 0.234937 -0.940057 0.712695 -3.09827</acceleration>
+          <wrench>0.405638 -0.22846 0.391536 0 -0 0</wrench>
+        </link>
+        <link name='panda_link7'>
+          <pose>0.306619 -0.003065 0.712763 -3.12005 0.020777 -0.785284</pose>
+          <velocity>4.4e-05 -3.9e-05 -4e-06 0.000234 0.000985 0.000567</velocity>
+          <acceleration>0.117382 -0.040858 0.111337 -0.465784 1.28981 -2.14313</acceleration>
+          <wrench>0.11756 -0.04092 0.111506 0 -0 0</wrench>
+        </link>
+        <link name='right_hand_v2s_index_distal_link'>
+          <pose>0.29042 -0.027138 0.441362 -0.128261 1.42011 -2.48253</pose>
+          <velocity>-0.000144 2.1e-05 -1.1e-05 8.6e-05 3.6e-05 0.000608</velocity>
+          <acceleration>-0.156307 0.171911 0.119282 0.216446 0.161718 1.87546</acceleration>
+          <wrench>-0.000782 0.00086 0.000596 0 -0 0</wrench>
+        </link>
+        <link name='right_hand_v2s_index_knuckle_link'>
+          <pose>0.294058 -0.020282 0.506142 -1.71469 1.41978 -2.49834</pose>
+          <velocity>-0.000138 7e-06 -6e-06 0.000585 0.000538 0.000504</velocity>
+          <acceleration>-0.127919 0.139896 0.129045 -1.3748 1.41876 -1.5941</acceleration>
+          <wrench>-0.001151 0.001259 0.001161 0 -0 0</wrench>
+        </link>
+        <link name='right_hand_v2s_index_middle_link'>
+          <pose>0.293037 -0.025121 0.463112 -0.130681 1.42006 -2.48498</pose>
+          <velocity>-0.000143 2.2e-05 -1.3e-05 7.8e-05 2.8e-05 0.000605</velocity>
+          <acceleration>-0.153602 0.173754 0.11599 0.198006 0.144164 1.87179</acceleration>
+          <wrench>-0.000768 0.000869 0.00058 0 -0 0</wrench>
+        </link>
+        <link name='right_hand_v2s_index_proximal_link'>
+          <pose>0.295666 -0.023117 0.484863 -0.135793 1.41996 -2.49015</pose>
+          <velocity>-0.000145 2.2e-05 -1.3e-05 3.6e-05 -1.4e-05 0.000614</velocity>
+          <acceleration>-0.155685 0.174757 0.116176 0.122186 0.067683 1.88911</acceleration>
+          <wrench>-0.000778 0.000874 0.000581 0 -0 0</wrench>
+        </link>
+        <link name='right_hand_v2s_little_distal_link'>
+          <pose>0.342862 0.02509 0.448912 -3.07074 1.29439 0.853061</pose>
+          <velocity>-0.000161 4.1e-05 -3.2e-05 -4.6e-05 -8.8e-05 0.000306</velocity>
+          <acceleration>-0.206093 0.225955 0.107665 -0.181341 -0.193879 0.86957</acceleration>
+          <wrench>-0.00103 0.00113 0.000538 0 -0 0</wrench>
+        </link>
+        <link name='right_hand_v2s_little_knuckle_link'>
+          <pose>0.330265 0.015749 0.512243 1.64988 1.29421 0.861619</pose>
+          <velocity>-0.000153 2.6e-05 -2.9e-05 0.000589 0.000539 0.000557</velocity>
+          <acceleration>-0.17568 0.189323 0.117834 -1.37881 1.41407 -1.50401</acceleration>
+          <wrench>-0.001581 0.001704 0.001061 0 -0 0</wrench>
+        </link>
+        <link name='right_hand_v2s_little_middle_link'>
+          <pose>0.338919 0.020562 0.470076 -3.06947 1.29436 0.854382</pose>
+          <velocity>-0.000159 4.1e-05 -3.3e-05 -5.5e-05 -9.7e-05 0.000307</velocity>
+          <acceleration>-0.203441 0.228184 0.105856 -0.205251 -0.217245 0.870304</acceleration>
+          <wrench>-0.001017 0.001141 0.000529 0 -0 0</wrench>
+        </link>
+        <link name='right_hand_v2s_little_proximal_link'>
+          <pose>0.334988 0.016021 0.491241 -3.06678 1.29431 0.857178</pose>
+          <velocity>-0.000161 4.2e-05 -3.3e-05 -0.000102 -0.000143 0.000288</velocity>
+          <acceleration>-0.205327 0.230171 0.105822 -0.301544 -0.312428 0.830395</acceleration>
+          <wrench>-0.001027 0.001151 0.000529 0 -0 0</wrench>
+        </link>
+        <link name='right_hand_v2s_middle_distal_link'>
+          <pose>0.30935 -0.008052 0.436382 -2.39871 1.54248 1.52816</pose>
+          <velocity>-0.000156 3e-05 -1.8e-05 1.2e-05 -3.6e-05 0.000509</velocity>
+          <acceleration>-0.187983 0.201939 0.115544 -0.014663 -0.054751 1.52759</acceleration>
+          <wrench>-0.00094 0.00101 0.000578 0 -0 0</wrench>
+        </link>
+        <link name='right_hand_v2s_middle_knuckle_link'>
+          <pose>0.306787 -0.007409 0.501532 2.37309 1.54079 1.5876</pose>
+          <velocity>-0.00015 1.6e-05 -1.4e-05 0.000596 0.000547 0.000527</velocity>
+          <acceleration>-0.159552 0.168756 0.12582 -1.35996 1.4009 -1.56098</acceleration>
+          <wrench>-0.001436 0.001519 0.001132 0 -0 0</wrench>
+        </link>
+        <link name='right_hand_v2s_middle_middle_link'>
+          <pose>0.30933 -0.00868 0.458374 -2.38907 1.54222 1.53781</pose>
+          <velocity>-0.000155 3.1e-05 -2e-05 3e-06 -4.5e-05 0.000507</velocity>
+          <acceleration>-0.185022 0.20392 0.112731 -0.035613 -0.074937 1.52621</acceleration>
+          <wrench>-0.000925 0.00102 0.000564 0 -0 0</wrench>
+        </link>
+        <link name='right_hand_v2s_middle_proximal_link'>
+          <pose>0.309321 -0.00932 0.480364 -2.36923 1.54168 1.55765</pose>
+          <velocity>-0.000157 3.1e-05 -2e-05 -4.3e-05 -9.1e-05 0.000506</velocity>
+          <acceleration>-0.187158 0.205374 0.112752 -0.124676 -0.164049 1.52364</acceleration>
+          <wrench>-0.000936 0.001027 0.000564 0 -0 0</wrench>
+        </link>
+        <link name='right_hand_v2s_ring_distal_link'>
+          <pose>0.324405 0.006839 0.441879 -2.96335 1.46242 0.962491</pose>
+          <velocity>-0.000159 3.6e-05 -2.6e-05 -1.6e-05 -6.2e-05 0.000447</velocity>
+          <acceleration>-0.198717 0.214385 0.111651 -0.096551 -0.128486 1.31686</acceleration>
+          <wrench>-0.000994 0.001072 0.000558 0 -0 0</wrench>
+        </link>
+        <link name='right_hand_v2s_ring_knuckle_link'>
+          <pose>0.319516 0.005159 0.506918 1.77074 1.46197 0.984321</pose>
+          <velocity>-0.000153 2.2e-05 -2.2e-05 0.000599 0.00055 0.00054</velocity>
+          <acceleration>-0.170827 0.181331 0.121799 -1.35576 1.39558 -1.54191</acceleration>
+          <wrench>-0.001537 0.001632 0.001096 0 -0 0</wrench>
+        </link>
+        <link name='right_hand_v2s_ring_middle_link'>
+          <pose>0.323051 0.004881 0.46375 -2.95998 1.46235 0.965878</pose>
+          <velocity>-0.000158 3.6e-05 -2.7e-05 -2.5e-05 -7.1e-05 0.000446</velocity>
+          <acceleration>-0.195965 0.21646 0.109357 -0.11873 -0.149967 1.31616</acceleration>
+          <wrench>-0.00098 0.001082 0.000547 0 -0 0</wrench>
+        </link>
+        <link name='right_hand_v2s_ring_proximal_link'>
+          <pose>0.321709 0.00291 0.48562 -2.95288 1.46221 0.973026</pose>
+          <velocity>-0.00016 3.7e-05 -2.7e-05 -7.2e-05 -0.000118 0.000439</velocity>
+          <acceleration>-0.198043 0.218112 0.109295 -0.21226 -0.243174 1.30157</acceleration>
+          <wrench>-0.00099 0.001091 0.000546 0 -0 0</wrench>
+        </link>
+        <link name='right_hand_v2s_thumb_distal_link'>
+          <pose>0.298385 -0.079104 0.508563 -0.845118 0.966872 -1.16952</pose>
+          <velocity>-5.9e-05 2.2e-05 -3.2e-05 -0.000379 0.000474 0.001167</velocity>
+          <acceleration>0.225035 0.116477 0.1143 -2.24064 0.117773 -0.986901</acceleration>
+          <wrench>0.011252 0.005824 0.005715 0 -0 0</wrench>
+        </link>
+        <link name='right_hand_v2s_thumb_knuckle_link'>
+          <pose>0.290612 -0.043572 0.538017 -2.786 0.422899 -1.58499</pose>
+          <velocity>-0.00011 -1.2e-05 9e-06 -9.1e-05 0.000607 0.001335</velocity>
+          <acceleration>-0.044182 0.063933 0.132143 -0.384146 -0.04515 0.016068</acceleration>
+          <wrench>-0.000398 0.000575 0.001189 0 -0 0</wrench>
+        </link>
+        <link name='right_hand_v2s_thumb_proximal_link'>
+          <pose>0.296176 -0.06268 0.523032 -1.04686 0.717725 -1.43711</pose>
+          <velocity>-7.4e-05 2.1e-05 -3.1e-05 -0.000405 0.000567 0.001177</velocity>
+          <acceleration>0.148549 0.128174 0.093886 -2.41304 0.276521 -0.960118</acceleration>
+          <wrench>0.007427 0.006409 0.004694 0 -0 0</wrench>
+        </link>
+      </model>
+      <light name='sun'>
+        <pose>0 0 10 0 -0 0</pose>
+      </light>
+    </state>
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>0.854833 -0.744692 0.669907 0 0.275643 2.35619</pose>
+        <view_controller>orbit</view_controller>
+        <projection_type>perspective</projection_type>
+      </camera>
+    </gui>
+  </world>
+</sdf>

@@ -11,7 +11,9 @@
   <!-- Robot Customization -->
   <arg name="arm_id"      default="panda" doc="Name of the panda robot to spawn" />
   <arg name="use_gripper" default="false" doc="Should a franka hand be mounted on the flange?" />
+  
   <arg name="use_qbhand"  default="true"  doc="Should a franka hand be mounted on the flange?" />
+
   <arg name="controller"  default="cartesian_impedance_example_controller"     doc="Which example controller should be started? (One of {cartesian_impedance,model,force,joint_position,joint_velocity}_example_controller)" />
   <arg name="x"           default="0"     doc="How far forward to place the base of the robot in [m]?" />
   <arg name="y"           default="0"     doc="How far leftwards to place the base of the robot in [m]?" />
@@ -57,6 +59,7 @@
 
   <param name="m_ee" value="0.76" if="$(arg use_gripper)" />
   <param name="m_ee" value="0.76" if="$(arg use_qbhand)" />
+  <param name="/$(arg arm_id)/NE_T_EE" value="1 0 0 0 0 1 0 0 0 0 1 0.5 0 0 0 1" if="$(arg use_qbhand)" />
 
   <arg name="unpause" value="$(eval '' if arg('paused') else '-unpause')" />
   <node name="$(arg arm_id)_model_spawner"
