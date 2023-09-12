@@ -67,7 +67,7 @@ class PandaRobotCustom:
         rospy.sleep(0.5)
 
         self.used_controllers:list = [cnt.name for cnt in self.list_controllers()]
-        
+        self.log.info(f"Loaded controlers: {self.used_controllers}")
         self.log.info(f"Panda initialization {my_log.GREEN}DONE")
 
     def franka_state_callback(self, msg) -> None:
