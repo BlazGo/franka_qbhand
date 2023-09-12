@@ -1,3 +1,4 @@
+import numpy as np
 import rospy
 import tf
 from tf.transformations import quaternion_from_euler, euler_from_quaternion
@@ -8,16 +9,26 @@ from franka_msgs.srv import SetEEFrame, SetEEFrameRequest, SetEEFrameResponse
 from franka_msgs.srv import SetLoad, SetLoadRequest, SetLoadResponse
 from controller_manager_msgs.srv import SwitchController, SwitchControllerRequest, SwitchControllerResponse
 from controller_manager_msgs.srv import ListControllers, ListControllersRequest, ListControllersResponse
-import numpy as np
 import my_log
-import tools
+import my_tools
 
 
+# EE frame parameters
+TOOL_MASS: float = 0.76 # [kg]
+# the two parameters below are not accurate
+F_X_CENTER_TOOL: list = [0.12, -0.5, 0.05]
+TOOL_INERTIA:list = [0.0, 0.0, 0.0,
+                     0.0, 0.0, 0.0,
+                     0.0, 0.0, 0.0]
+    
 class PandaRobotCustom:
     # topics
     set_EE_frame_topic = "/franka_control/set_EE_frame"
     franka_state_topic = "/franka_state_controller/franka_states"
+    
     compliance_topic = "/cartesian_impedance_example_controller/dynamic_reconfigure_compliance_param_node"
+    
+    
     set_EE_load_topic = "/franka_control/set_load"
     switch_controller_topic = "controller_manager/switch_controller"
     list_controllers_topic = "controller_manager/list_controllers"
@@ -27,7 +38,10 @@ class PandaRobotCustom:
     EE_frame: str = "qbhand_flange1"
 
     Q_INIT: list = [0, -0.785398163, 0, -2.35619449, 0, 1.57079632679, 0.785398163397]
-
+    DEFAULT_CART_STIFFNESS_TRANS:float = 200.0
+    DEFAULT_CART_STIFFNESS_ROT:float = 10.0
+    DEFAULT_CART_STIFFNESS_NULL:float = 0.5
+    
     # controller strategies
     STRICT: int = 2
     BEST_EFFORT: int = 1
@@ -51,47 +65,10 @@ class PandaRobotCustom:
         self.switch_controller_proxy = rospy.ServiceProxy(self.switch_controller_topic, SwitchController)
         self.list_controllers_proxy = rospy.ServiceProxy(self.list_controllers_topic, ListControllers)
         rospy.sleep(0.5)
-        self.init_robot()
 
-        self.log.info(f"Panda initialization {my_log.GREEN}DONE")
-
-    def init_robot(self):
         self.used_controllers:list = [cnt.name for cnt in self.list_controllers()]
         
-        # EE frame transformation construction
-        T_trans = np.eye(4)
-        T_trans[0:3, 3] = np.array([0.0, -0.0, 0.2]).T
-
-        T_rot = np.eye(4)
-        T_rot[0:3, 0:3] = tools.get_rotation_matrix(angle=np.deg2rad(45), axis="z")
-
-        T_new = np.matmul(T_rot, T_trans)
-        T_new = np.reshape(T_new, (16), order = 'C') # msg formaat
-
-        self.log.debug(f"{T_new}")
-        
-        # EE frame parameters
-        self.tool_mass = 0.0
-        # the two parameters below are not accurate
-        self.F_x_center_tool = [0.0, -0.0, 0.0]
-        self.tool_inertia = [0.0, 0.0,     0.0,
-                             0.0,      0.0, 0.0,
-                             0.0,      0.0,     0.0]
-        
-        response = self.switch_controller(stop_controllers=self.used_controllers)
-        self.log.debug(f"Response switch controllers: {response}")
-        response = self.set_EE_load(self.tool_mass,
-                                    self.F_x_center_tool,
-                                    self.tool_inertia)
-        self.log.debug(f"Response set EE load: {response}")
-        response = self.set_NE_T_EE_transform(NE_T_EE=T_new)
-        self.log.debug(f"Response set EE trans: {response}")
-        response = self.switch_controller(start_controllers=self.used_controllers)
-        self.log.debug(f"Response switch controllers: {response}")
-
-        # Stiffness setup
-        self.set_stiffness(trans=400.0, rot=20.0)
-        self.log.debug(f"Stiffness: {self.get_stiffness()}")
+        self.log.info(f"Panda initialization {my_log.GREEN}DONE")
 
     def franka_state_callback(self, msg) -> None:
         # Save the state
