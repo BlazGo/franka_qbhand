@@ -14,12 +14,14 @@ import my_tools
 
 
 # EE frame parameters
-TOOL_MASS: float = 0.76 # [kg]
+TOOL_MASS: float = 0.76 * 2 # [kg] (compensation mass on opposite side)
+TOOL_MASS: float = 0.0 # [kg] we already set it in launch file
+
 # the two parameters below are not accurate
-F_X_CENTER_TOOL: list = [0.12, -0.5, 0.05]
-TOOL_INERTIA:list = [0.0, 0.0, 0.0,
-                     0.0, 0.0, 0.0,
-                     0.0, 0.0, 0.0]
+F_X_CENTER_TOOL: list = [0.12, -0.0, 0.05]
+TOOL_INERTIA:list = [0.01, 0.0, 0.0,
+                     0.0, 0.01, 0.0,
+                     0.0, 0.0, 0.01]
     
 class PandaRobotCustom:
     # topics
@@ -28,14 +30,13 @@ class PandaRobotCustom:
     
     compliance_topic = "/cartesian_impedance_example_controller/dynamic_reconfigure_compliance_param_node"
     
-    
     set_EE_load_topic = "/franka_control/set_load"
     switch_controller_topic = "controller_manager/switch_controller"
     list_controllers_topic = "controller_manager/list_controllers"
     cartesian_pose_topic = "/cartesian_impedance_example_controller/equilibrium_pose"
 
     BASE_LINK: str = "panda_link0"
-    EE_frame: str = "qbhand_flange1"
+    EE_frame: str = "panda_EE"
 
     Q_INIT: list = [0, -0.785398163, 0, -2.35619449, 0, 1.57079632679, 0.785398163397]
     DEFAULT_CART_STIFFNESS_TRANS:float = 200.0
@@ -68,6 +69,48 @@ class PandaRobotCustom:
 
         self.used_controllers:list = [cnt.name for cnt in self.list_controllers()]
         self.log.info(f"Loaded controlers: {self.used_controllers}")
+        
+        # Stiffness setup
+        self.set_stiffness(trans=400.0, rot=20.0)
+        self.log.info(f"Stiffness: {self.get_stiffness()}")
+        
+        rospy.sleep(1.0)
+        
+        response = self.switch_controller(stop_controllers=self.used_controllers)
+        self.log.info(f"Response switch controllers: {response}")
+        response = self.list_controllers()
+        self.log.info(f"Controllers: {response}")
+
+        rospy.sleep(1.0)
+        
+        response = self.set_EE_load(TOOL_MASS,
+                                    F_X_CENTER_TOOL,
+                                    TOOL_INERTIA)
+        self.log.debug(f"Response set EE load: {response}")
+        
+        # EE frame transformation construction
+        T_trans = np.eye(4)
+        T_trans[0:3, 3] = np.array([-0.92, -0.0, 0.05]).T
+
+        T_rot = np.eye(4)
+        T_rot[0:3, 0:3] = my_tools.get_rotation_matrix(angle=np.deg2rad(45), axis="z")
+
+        T_new = np.matmul(T_rot, T_trans)
+        T_new = np.reshape(T_new, (16), order = 'C') # msg formaat
+
+        self.log.debug(f"{T_new}")
+
+        # Set the EE (End Effector) frame transform
+        response = self.set_NE_T_EE_transform(NE_T_EE=T_new)
+        self.log.debug(f"Response set EE trans: {response}")
+        
+        rospy.sleep(1.0)
+
+        response = self.switch_controller(start_controllers=self.used_controllers)
+        self.log.info(f"Response switch controllers: {response}")
+        
+        rospy.sleep(1.0)
+
         self.log.info(f"Panda initialization {my_log.GREEN}DONE")
 
     def franka_state_callback(self, msg) -> None:
