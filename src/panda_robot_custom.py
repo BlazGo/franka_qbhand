@@ -67,7 +67,7 @@ class PandaRobotCustom:
         self.list_controllers_proxy = rospy.ServiceProxy(self.list_controllers_topic, ListControllers)
         rospy.sleep(0.5)
 
-        self.used_controllers:list = [cnt.name for cnt in self.list_controllers()]
+        self.used_controllers:list = [cnt.name for cnt in self.list_controllers(minimal=False)]
         self.log.info(f"Loaded controlers: {self.used_controllers}")
         
         # Stiffness setup
@@ -78,7 +78,7 @@ class PandaRobotCustom:
         
         response = self.switch_controller(stop_controllers=self.used_controllers)
         self.log.info(f"Response switch controllers: {response}")
-        response = self.list_controllers()
+        response = self.list_controllers(minimal=True)
         self.log.info(f"Controllers: {response}")
 
         rospy.sleep(1.0)
@@ -189,10 +189,18 @@ class PandaRobotCustom:
         rospy.sleep(1.0)
         return response
 
-    def list_controllers(self) -> ListControllersResponse:
+    def list_controllers(self, minimal=True) -> ListControllersResponse:
         msg = ListControllersRequest()
         response = self.list_controllers_proxy.call(msg)
-        return response.controller  # Unpacks the actual list from msg
+        if minimal:
+            cnts = [cnt.name for cnt in response.controller]
+            states = [cnt.state for cnt in response.controller]
+            response = []
+            for i in range(len(cnts)):
+                response.append([cnts[i], states[i]])
+            return response 
+        else:
+            return response.controller # Unpacks the actual list from msg
 
     def cart_move(self, trans, rot):
         msg = PoseStamped()
