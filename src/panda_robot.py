@@ -23,7 +23,7 @@ TOOL_INERTIA:list = [0.01, 0.0, 0.0,
                      0.0, 0.01, 0.0,
                      0.0, 0.0, 0.01]
     
-class PandaRobotCustom:
+class PandaRobot:
     # topics
     set_EE_frame_topic = "/franka_control/set_EE_frame"
     franka_state_topic = "/franka_state_controller/franka_states"
@@ -226,5 +226,5 @@ class PandaRobotCustom:
 if __name__ == "__main__":
 
     rospy.init_node("panda_custom", anonymous=True)
-    robot = PandaRobotCustom(log_level=my_log.DEBUG)
+    robot = PandaRobot(log_level=my_log.DEBUG)
     #trans, rot = robot.get_cart_pose()
