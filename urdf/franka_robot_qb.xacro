@@ -36,7 +36,8 @@
 
     <xacro:if value="$(arg use_qbhand)">
       
-      <xacro:arg name="compensation_qb_tcp_xyz" default="-0.20 -0.003 0.053"/>
+      <xacro:arg name="compensation_qb_tcp_xyz" default="-0.20 0.003 0.053"/>
+      <xacro:arg name="compensation_qb_tcp_xyz" default="-0.20 0.015 0.053"/>
       <xacro:arg name="qb_mass" default="0.3735"/>
 
       <joint name="EE_fix_joint" type="fixed">
