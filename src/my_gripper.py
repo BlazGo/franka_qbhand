@@ -17,9 +17,8 @@ class QbHand:
         self._current_value = value
         self.qb_publisher.publish(msg)
     
-    def linear_move(self, value:float):
+    def linear_move(self, value:float, move_time:float=2.0):
         steps = 10
-        move_time = 2.0
         dt = move_time/steps
         
         ramp = np.linspace(self.state, value, steps)
