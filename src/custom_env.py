@@ -57,7 +57,7 @@ class CustomEnv(gym.Env):
                                    "r": np.linspace(-r_range, r_range, self.OBSERVATION_SPACE_SHAPE[2])}
 
         # move robot to inital position
-        self.robot.grasp_without_force(width=0.08, t_move=2, speed=0.2)
+        self.robot.grasp(width=0.08, t_move=2, speed=0.2)
         self.robot.cart_move_smooth(goal=self.BASE_COORD_ROBOT)
 
     def step(self, action: int):
@@ -125,43 +125,6 @@ class CustomEnv(gym.Env):
 
     def render(self, mode='ansi'):
         return "[INFO] "
-
-
-def step(state):
-    i, j, k = state
-    info = {}
-    done = False
-    reward = 0
-
-    z_up = 0.1
-    z_grab = 0.018
-
-    # Action
-    robot.grasp_without_force(width=0.08, t_move=2, speed=0.2)
-    model.spawn(pose=model_pose)
-
-    goal = [x_base + x[i], y[j], z_up, np.pi, 0, np.deg2rad(r[k])]
-    robot.cart_move_smooth(goal=goal, t_move=2)
-    goal = [x_base + x[i], y[j], z_grab, np.pi, 0, np.deg2rad(r[k])]
-    robot.cart_move_smooth(goal=goal, t_move=2.5)
-
-    robot.grasp(width=0.03, force=5, t_move=2.0, speed=0.1)
-    rospy.sleep(0.5)
-
-    goal[2] = 0.1
-    robot.cart_move_smooth(goal=goal, t_move=1.5)
-
-    # Reward
-    _pose = model.get_state()
-    if _pose.pose.position.z > 0.021:
-        reward = 1
-        success_table[i, j, k] = 1
-        print("[INFO] Success! Picked up hca.")
-        print(_pose.pose. position)
-    model.delete()
-
-    observation = 0
-    return observation, reward, done, False, info
 
 
 if __name__ == "__main__":
