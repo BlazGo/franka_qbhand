@@ -9,9 +9,10 @@ from franka_msgs.srv import SetEEFrame, SetEEFrameRequest, SetEEFrameResponse
 from franka_msgs.srv import SetLoad, SetLoadRequest, SetLoadResponse
 from controller_manager_msgs.srv import SwitchController, SwitchControllerRequest, SwitchControllerResponse
 from controller_manager_msgs.srv import ListControllers, ListControllersRequest, ListControllersResponse
+
 import my_log
 import my_tools
-
+from my_gripper import QbHand
 
 # EE frame parameters
 TOOL_MASS: float = 0.76 * 2 # [kg] (compensation mass on opposite side)
@@ -90,13 +91,13 @@ class PandaRobot:
         
         # EE frame transformation construction
         T_trans = np.eye(4)
-        T_trans[0:3, 3] = np.array([-0.92, -0.0, 0.05]).T
+        T_trans[0:3, 3] = np.array([0.20, -0.003, 0.053]).T
 
         T_rot = np.eye(4)
-        T_rot[0:3, 0:3] = my_tools.get_rotation_matrix(angle=np.deg2rad(45), axis="z")
+        T_rot[0:3, 0:3] = my_tools.get_rotation_matrix(angle=np.deg2rad(-45), axis="z")
 
         T_new = np.matmul(T_rot, T_trans)
-        T_new = np.reshape(T_new, (16), order = 'C') # msg formaat
+        T_new = np.reshape(T_new, (16), order = 'F') # msg formaat
 
         self.log.debug(f"{T_new}")
 
@@ -108,6 +109,9 @@ class PandaRobot:
 
         response = self.switch_controller(start_controllers=self.used_controllers)
         self.log.info(f"Response switch controllers: {response}")
+        
+        self.log.info("Initializing QbHand")
+        self.gripper = QbHand()
         
         rospy.sleep(1.0)
 
@@ -219,12 +223,44 @@ class PandaRobot:
 
         self.cartesian_goal_publisher.publish(msg)
 
-    def cart_move_smooth(self, goal):
-        pass
+    def cart_move_smooth(self, trans, rot):
+        # TODO maybe add pid compensation
+        n_steps = 10
+        t_move = 4.0
+        dt = t_move / n_steps
+        t = np.linspace(0, 1, n_steps)
 
+        trans_start, rot_start_q = self.get_cart_pose()
+        
+        diff_trans = []
+        for i in range(3):
+            diff_trans.append(trans[i] - trans_start[i])
+            
+        diff_trans = np.asarray(diff_trans)
+        trans_start = np.asanyarray(trans_start)
+        
+        for t_curr in t:
+            value = my_tools.interpolate(t_curr)
+            curr_trans = trans_start + diff_trans*value
+            self.cart_move(trans=curr_trans,rot=rot)
+            rospy.sleep(dt)    
+            
+
+    def grasp(self, value:float, t:float=2.0):
+        self.gripper.linear_move(value, move_time=t)
 
 if __name__ == "__main__":
 
     rospy.init_node("panda_custom", anonymous=True)
-    robot = PandaRobot(log_level=my_log.DEBUG)
-    #trans, rot = robot.get_cart_pose()
+    robot = PandaRobot(log_level=my_log.INFO)
+    
+    trans, rot = robot.get_cart_pose()
+    print(trans, euler_from_quaternion(rot))
+    
+    robot.cart_move_smooth([0.6, 0.2, 0.4], [-1, 0, 0, 0])
+    robot.cart_move_smooth([0.6, 0.0, 0.3], [-1, 0, 0, 0])
+    robot.grasp(1.0)
+    robot.grasp(0.0)
+    
+    trans, rot = robot.get_cart_pose()
+    print(trans, euler_from_quaternion(rot))
