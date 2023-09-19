@@ -2,39 +2,57 @@ import rospy
 import tf
 from gazebo_msgs.srv import SpawnModel, DeleteModel, GetModelState
 from geometry_msgs.msg import Point, Pose, Quaternion
+import my_log
+
+log = my_log.logger()
+
 
 class Model:
+    
+    SERVICE_TOPIC = "gazebo/spawn_sdf_model"
+    DELETE_TOPIC = "gazebo/delete_model"
+    SPAWN_TOPIC = "/gazebo/spawn_sdf_model"
+    STATE_TOPIC = "gazebo/get_model_state"
+    
     def __init__(self, name='/home/bg/custom_models/hca_box/model.sdf'):
-        """
-        __init__ initialises model required services
-             
-        :param name: define path/name to the file [.sdf] filetype
-        """
+        self.MODEL_XML = name
+        self.MODEL_NAME = "hca_box"
         
-        self.model_name = name
-
-        rospy.wait_for_service("gazebo/spawn_sdf_model")
-        self.delete_model = rospy.ServiceProxy('gazebo/delete_model', DeleteModel)
-        self.spawn_model = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
-        self.get_model_state = rospy.ServiceProxy('gazebo/get_model_state', GetModelState)
+        rospy.wait_for_service(self.SERVICE_TOPIC, timeout=10.0)
+        
+        self._delete_model = rospy.ServiceProxy(self.DELETE_TOPIC, DeleteModel)
+        self._spawn_model = rospy.ServiceProxy(self.SPAWN_TOPIC, SpawnModel)
+        self._get_model_state = rospy.ServiceProxy(self.STATE_TOPIC, GetModelState)
 
     def spawn(self, pose=[0.6, 0, 0.05, 0, 0, 0]):
+        log.info(f"Spawning model: @{self.MODEL_NAME} {pose}")
         quat = tf.transformations.quaternion_from_euler(pose[3], pose[4], pose[5])
         orient = Quaternion(quat[0], quat[1], quat[2], quat[3])
         model_pose = Pose(position = Point(x=pose[0], y=pose[1], z=pose[2]),
                           orientation = orient)
 
-        self.spawn_model(model_name="hca_box",
-                         model_xml=open(self.model_name, 'r').read(),
+        self._spawn_model(model_name=self.MODEL_NAME,
+                         model_xml=open(self.MODEL_XML, 'r').read(),
                          robot_namespace='',
                          initial_pose=model_pose,
                          reference_frame='world')
         rospy.sleep(1)
 
     def delete(self):
-        self.delete_model(model_name="hca_box")
+        log.info(f"Spawning model: @{self.MODEL_NAME}")
+        self._delete_model(model_name=self.MODEL_NAME)
         rospy.sleep(1)
 
     def get_state(self):
-        pose = self.get_model_state("hca_box", "link")
-        return pose
+        return self._get_model_state(self.MODEL_NAME, "link")
+
+    def get_pose(self):
+        state = self.get_state()
+        return state.pose
+
+
+if __name__ == "__main__":
+    model = Model()
+    model.spawn()
+    print(model.get_pose())
+    model.delete()
