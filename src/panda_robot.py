@@ -72,7 +72,7 @@ class PandaRobot:
         self.log.info(f"Loaded controlers: {self.used_controllers}")
         
         # Stiffness setup
-        self.set_stiffness(trans=400.0, rot=20.0)
+        self.set_stiffness(trans=400.0, rot=20.0, null=1.0)
         self.log.info(f"Stiffness: {self.get_stiffness()}")
         
         rospy.sleep(1.0)
@@ -245,7 +245,6 @@ class PandaRobot:
             self.cart_move(trans=curr_trans,rot=rot)
             rospy.sleep(dt)    
             
-
     def grasp(self, value:float, t:float=2.0):
         self.gripper.linear_move(value, move_time=t)
 

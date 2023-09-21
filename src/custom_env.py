@@ -1,4 +1,5 @@
 import rospy
+from tf.transformations import quaternion_from_euler, euler_from_quaternion
 import gym
 from gym import spaces
 
@@ -57,8 +58,9 @@ class CustomEnv(gym.Env):
                                    "r": np.linspace(-r_range, r_range, self.OBSERVATION_SPACE_SHAPE[2])}
 
         # move robot to inital position
-        self.robot.grasp(width=0.08, t_move=2, speed=0.2)
-        self.robot.cart_move_smooth(goal=self.BASE_COORD_ROBOT)
+        self.robot.grasp(value=0.0)
+        self.robot.cart_move_smooth(trans=self.BASE_COORD_ROBOT[0:3],
+                                    rot=quaternion_from_euler(self.BASE_COORD_ROBOT[3], self.BASE_COORD_ROBOT[4], self.BASE_COORD_ROBOT[5]))
 
     def step(self, action: int):
         info = {}
@@ -119,13 +121,18 @@ class CustomEnv(gym.Env):
         return observation, reward, done, info
 
     def reset(self, state=[0, 0, 0]):
+        info = {}
         self.state = state
+        
         # observation (reward, done, info musn't be included)
-        return self.state
+        return self.state, info
 
     def render(self, mode='ansi'):
         return "[INFO] "
 
 
 if __name__ == "__main__":
-    pass
+    rospy.init_node("gym_env")
+    env = CustomEnv()
+    
+    observation, info = env.reset()
