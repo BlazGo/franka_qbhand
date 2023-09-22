@@ -17,12 +17,12 @@ class CustomEnv(gym.Env):
     metadata = {'render.modes': ['ansi']}
 
     # dictionary returns array to be applied to state in step
-    _action_to_direction = {0: np.array([1,  0,  0]),
-                            1: np.array([-1, 0,  0]),
-                            2: np.array([0,  1,  0]),
-                            3: np.array([0, -1,  0]),
-                            4: np.array([0,  0,  1]),
-                            5: np.array([0,  0, -1])}
+    _action_to_direction = {0: np.array([1,  0,  0]), # forward
+                            1: np.array([-1, 0,  0]), # back
+                            2: np.array([0,  1,  0]), # right
+                            3: np.array([0, -1,  0]), # left
+                            4: np.array([0,  0,  1]), # rot+
+                            5: np.array([0,  0, -1])} # rot-
 
     N_DISCRETE_ACTIONS = 6
     OBSERVATION_SPACE_SHAPE = [7, 7, 5]
@@ -71,9 +71,9 @@ class CustomEnv(gym.Env):
         direction = self._action_to_direction[action]
 
         # add it to the state and clip to space
-        self.state = np.clip(a=(self.state + direction),
-                             a_min=[0, 0, 0],
-                             a_max=np.array(self.OBSERVATION_SPACE_SHAPE) - 1)
+        self.state = np.clip(a     = self.state + direction,
+                             a_min = [0, 0, 0],
+                             a_max = np.array(self.OBSERVATION_SPACE_SHAPE) - 1)
 
         # construct the actual robot state
         robot_state = [self.state_space_values["x"][self.state[0]],
@@ -99,7 +99,7 @@ class CustomEnv(gym.Env):
                   0,
                   np.deg2rad(robot_state[2])]
         self.robot.cart_move_smooth(goal=goal_2, t_move=2.5)
-        self.robot.grasp(width=0.035, force=4, t_move=2.0, speed=0.075)
+        self.robot.grasp(value=1.0, t=4.0)
         self.robot.cart_move_smooth(goal=goal_1, t_move=1.5)
 
         rospy.sleep(1.0)
@@ -111,7 +111,7 @@ class CustomEnv(gym.Env):
             print(_pose.pose.position)
 
         # reset
-        self.robot.grasp_without_force(width=0.08, t_move=2)
+        self.robot.grasp(value=0.0)
         self.model.delete()
 
         observation = self.state
@@ -136,3 +136,5 @@ if __name__ == "__main__":
     env = CustomEnv()
     
     observation, info = env.reset()
+    
+    trans, quat = env.robot.state()

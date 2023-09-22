@@ -223,6 +223,10 @@ class PandaRobot:
 
         self.cartesian_goal_publisher.publish(msg)
 
+    def cart_pid(self, trans, rot):
+        t_move = 4.0
+        err = 0
+
     def cart_move_smooth(self, trans, rot):
         # TODO maybe add pid compensation
         n_steps = 10
@@ -232,6 +236,7 @@ class PandaRobot:
 
         trans_start, rot_start_q = self.get_cart_pose()
         
+        # calculate difference from start
         diff_trans = []
         for i in range(3):
             diff_trans.append(trans[i] - trans_start[i])
