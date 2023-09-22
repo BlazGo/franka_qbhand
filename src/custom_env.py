@@ -1,5 +1,6 @@
 import rospy
 from tf.transformations import quaternion_from_euler, euler_from_quaternion
+
 import gym
 from gym import spaces
 
@@ -90,7 +91,7 @@ class CustomEnv(gym.Env):
                   np.pi,
                   0,
                   np.deg2rad(robot_state[2])]
-        self.robot.cart_move_smooth(goal=goal_1, t_move=2)
+        self.robot.cart_move_smooth(trans=goal_1[0:3], rot=quaternion_from_euler(*goal_1[3:6]))
 
         goal_2 = [self.BASE_COORD_ROBOT[0] + robot_state[0],
                   self.BASE_COORD_ROBOT[1] + robot_state[1],
@@ -98,9 +99,9 @@ class CustomEnv(gym.Env):
                   np.pi,
                   0,
                   np.deg2rad(robot_state[2])]
-        self.robot.cart_move_smooth(goal=goal_2, t_move=2.5)
+        self.robot.cart_move_smooth(trans=goal_2[0:3], rot=quaternion_from_euler(*goal_2[3:6]))
         self.robot.grasp(value=1.0, t=4.0)
-        self.robot.cart_move_smooth(goal=goal_1, t_move=1.5)
+        self.robot.cart_move_smooth(trans=goal_1[0:3], rot=quaternion_from_euler(*goal_1[3:6]))
 
         rospy.sleep(1.0)
 
@@ -137,4 +138,4 @@ if __name__ == "__main__":
     
     observation, info = env.reset()
     
-    trans, quat = env.robot.state()
+    env.step(action=env.action_space.sample())

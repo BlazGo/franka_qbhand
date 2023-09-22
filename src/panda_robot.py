@@ -78,7 +78,7 @@ class PandaRobot:
         rospy.sleep(1.0)
         
         response = self.switch_controller(stop_controllers=self.used_controllers)
-        self.log.info(f"Response switch controllers: {response}")
+        self.log.debug(f"Response switch controllers: {response}")
         response = self.list_controllers(minimal=True)
         self.log.info(f"Controllers: {response}")
 
@@ -108,7 +108,7 @@ class PandaRobot:
         rospy.sleep(1.0)
 
         response = self.switch_controller(start_controllers=self.used_controllers)
-        self.log.info(f"Response switch controllers: {response}")
+        self.log.debug(f"Response switch controllers: {response}")
         
         self.log.info("Initializing QbHand")
         self.gripper = QbHand()
