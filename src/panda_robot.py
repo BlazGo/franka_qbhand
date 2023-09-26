@@ -48,10 +48,15 @@ class PandaRobot:
     STRICT: int = 2
     BEST_EFFORT: int = 1
 
-    def __init__(self, log_level=my_log.INFO):
+    def __init__(self, log_level=my_log.INFO, move_feedback=False):
         self.log = my_log.logger(log_level)
         self.log.info("Initializing PandaRobot class")
 
+        # checking position to wait to finish the move
+        self.move_feedback = move_feedback
+        self.trans_tolerance = 0.001 # [m]
+        self.rot_tolerance = 0.01 # [rad]
+        
         self.compliance_client = Client(self.compliance_topic, timeout=1)
         self.state_listener = rospy.Subscriber(self.franka_state_topic,
                                                FrankaState,
@@ -249,7 +254,20 @@ class PandaRobot:
             curr_trans = trans_start + diff_trans*value
             self.cart_move(trans=curr_trans,rot=rot)
             rospy.sleep(dt)    
-            
+        
+        # keep publishing the last position
+        timeout = 0
+        if self.move_feedback == True:
+            for _ in range(4):
+                self.cart_move(trans=curr_trans,rot=rot)
+                rospy.sleep(dt)
+                
+                _trans, _rot = self.get_cart_pose()
+                for i, ax in enumerate(_trans):
+                    diff = trans[i] -_trans[i]
+                    if diff > self.trans_tolerance:
+                        continue
+                       
     def grasp(self, value:float, t:float=2.0):
         self.gripper.linear_move(value, move_time=t)
 
