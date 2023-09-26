@@ -2,11 +2,9 @@ import rospy
 from tf.transformations import quaternion_from_euler, euler_from_quaternion
 
 import gym
-from gym import spaces
-
 import numpy as np
 import matplotlib.pyplot as plt
-
+import my_log
 from gazeebo_model import Model
 from panda_robot import PandaRobot
 
@@ -28,13 +26,15 @@ class CustomEnv(gym.Env):
     N_DISCRETE_ACTIONS = 6
     OBSERVATION_SPACE_SHAPE = [7, 7, 5]
 
-    def __init__(self, observation_space_type="MultiDiscrete"):
+    def __init__(self, observation_space_type="MultiDiscrete", log_level=my_log.INFO):
         super(CustomEnv, self).__init__()
 
+        log = my_log.logger(level=log_level)
+
         self.model = Model()
-        self.robot = PandaRobot()
+        self.robot = PandaRobot(move_feedback=True)
         self.BASE_COORD_MODEL = [0.65, 0.0, 0.05, 0, 0, 0]
-        self.BASE_COORD_ROBOT = [0.65, 0.0, 0.1, np.pi, 0, 0]
+        self.BASE_COORD_ROBOT = [0.65, 0.0, 0.15, np.pi, 0, 0]
 
         # discrete action space definition 1x6
         self.action_space = gym.spaces.Discrete(self.N_DISCRETE_ACTIONS)
@@ -95,7 +95,7 @@ class CustomEnv(gym.Env):
 
         goal_2 = [self.BASE_COORD_ROBOT[0] + robot_state[0],
                   self.BASE_COORD_ROBOT[1] + robot_state[1],
-                  self.BASE_COORD_ROBOT[2] - 0.082,
+                  self.BASE_COORD_ROBOT[2] - 0.1,
                   np.pi,
                   0,
                   np.deg2rad(robot_state[2])]
@@ -107,14 +107,16 @@ class CustomEnv(gym.Env):
 
         # reward
         _pose = self.model.get_state()
-        if _pose.pose.position.z > 0.021:
+        if _pose.pose.position.z > 0.02:
             reward = 1
             print(_pose.pose.position)
 
         # reset
         self.robot.grasp(value=0.0)
         self.model.delete()
-
+        self.robot.cart_move_smooth(trans=self.BASE_COORD_ROBOT[0:3],
+                                    rot=quaternion_from_euler(self.BASE_COORD_ROBOT[3], self.BASE_COORD_ROBOT[4], self.BASE_COORD_ROBOT[5]))
+        
         observation = self.state
         info = {"action": action,
                 "robot_state": robot_state}
@@ -135,7 +137,13 @@ class CustomEnv(gym.Env):
 if __name__ == "__main__":
     rospy.init_node("gym_env")
     env = CustomEnv()
+    print(env.action_space, env.observation_space)
     
+    x = np.linspace(start=-0.01, stop=0.01, num= 3)
+    y = np.linspace(start=-0.01, stop=0.01, num= 3)
+    r = np.linspace(start=-10, stop=10, num=3)
+
+    success_table = np.zeros((len(x), len(y), len(r)))
     observation, info = env.reset()
     
     env.step(action=env.action_space.sample())
