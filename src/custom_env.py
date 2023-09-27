@@ -29,10 +29,10 @@ class CustomEnv(gym.Env):
     def __init__(self, observation_space_type="MultiDiscrete", log_level=my_log.INFO):
         super(CustomEnv, self).__init__()
 
-        log = my_log.logger(level=log_level)
+        self.log = my_log.logger(level=my_log.INFO)
 
-        self.model = Model()
-        self.robot = PandaRobot(move_feedback=True)
+        self.model = Model(log_level=my_log.WARNING)
+        self.robot = PandaRobot(log_level=my_log.WARNING, move_feedback=True)
         self.BASE_COORD_MODEL = [0.65, 0.0, 0.05, 0, 0, 0]
         self.BASE_COORD_ROBOT = [0.65, 0.0, 0.15, np.pi, 0, 0]
 
@@ -49,8 +49,8 @@ class CustomEnv(gym.Env):
                                                     dtype=float)
 
         # actual state space in [m] (symmetric)
-        x_range = 0.04
-        y_range = 0.04
+        x_range = 0.05
+        y_range = 0.05
         r_range = 30
 
         # pack in a dictionary
@@ -63,7 +63,7 @@ class CustomEnv(gym.Env):
         self.robot.cart_move_smooth(trans=self.BASE_COORD_ROBOT[0:3],
                                     rot=quaternion_from_euler(self.BASE_COORD_ROBOT[3], self.BASE_COORD_ROBOT[4], self.BASE_COORD_ROBOT[5]))
 
-    def step(self, action: int):
+    def step(self, action: int, abs_state=None):
         info = {}
         done = False
         reward = 0
@@ -71,15 +71,22 @@ class CustomEnv(gym.Env):
         # get array from action
         direction = self._action_to_direction[action]
 
-        # add it to the state and clip to space
-        self.state = np.clip(a     = self.state + direction,
-                             a_min = [0, 0, 0],
-                             a_max = np.array(self.OBSERVATION_SPACE_SHAPE) - 1)
+        if type(abs_state) != list:
+            # add it to the state and clip to space
+            self.state = np.clip(a     = self.state + direction,
+                                a_min = [0, 0, 0],
+                                a_max = np.array(self.OBSERVATION_SPACE_SHAPE) - 1)
+        else:
+            # option to go to any state
+            self.state = abs_state
+
 
         # construct the actual robot state
         robot_state = [self.state_space_values["x"][self.state[0]],
                        self.state_space_values["y"][self.state[1]],
                        self.state_space_values["r"][self.state[2]]]
+        
+        self.log.info(f"State: {state} Actual: {robot_state}")
 
         # spawn model at default coordinates
         self.model.spawn(pose=self.BASE_COORD_MODEL)
@@ -95,7 +102,7 @@ class CustomEnv(gym.Env):
 
         goal_2 = [self.BASE_COORD_ROBOT[0] + robot_state[0],
                   self.BASE_COORD_ROBOT[1] + robot_state[1],
-                  self.BASE_COORD_ROBOT[2] - 0.1,
+                  self.BASE_COORD_ROBOT[2] - 0.065,
                   np.pi,
                   0,
                   np.deg2rad(robot_state[2])]
@@ -107,10 +114,9 @@ class CustomEnv(gym.Env):
 
         # reward
         _pose = self.model.get_state()
-        if _pose.pose.position.z > 0.02:
+        if _pose.pose.position.z > 0.04:
             reward = 1
-            print(_pose.pose.position)
-
+            self.log.info(f"@{self.model.MODEL_NAME} picked up at state {self.state}")
         # reset
         self.robot.grasp(value=0.0)
         self.model.delete()
@@ -135,15 +141,38 @@ class CustomEnv(gym.Env):
 
 
 if __name__ == "__main__":
+    import itertools
+    import my_log
+    import time
+    
+    log = my_log.logger()
+    
     rospy.init_node("gym_env")
     env = CustomEnv()
-    print(env.action_space, env.observation_space)
     
-    x = np.linspace(start=-0.01, stop=0.01, num= 3)
-    y = np.linspace(start=-0.01, stop=0.01, num= 3)
-    r = np.linspace(start=-10, stop=10, num=3)
-
-    success_table = np.zeros((len(x), len(y), len(r)))
+    reward_table = np.zeros(tuple(env.OBSERVATION_SPACE_SHAPE))
     observation, info = env.reset()
     
-    env.step(action=env.action_space.sample())
+    x = range(env.OBSERVATION_SPACE_SHAPE[0])
+    y = range(env.OBSERVATION_SPACE_SHAPE[1])
+    r = range(env.OBSERVATION_SPACE_SHAPE[2])
+
+    states = itertools.product(x, y, r)
+    n_states = len(x) * len(y) * len(r)
+    
+    i = 0
+    for state in states:
+        t1 = time.time()
+        i += 1
+
+        # ------ Actual step and reward ------ #
+        observation, reward, done, info = env.step(action=env.action_space.sample(), abs_state=state)
+        reward_table[state[0], state[1], state[2]] = reward
+        
+        # save progress
+        np.save("reward_table", reward_table)
+        
+        # loop time * remaining states
+        t_remaining = (time.time()-t1)*(n_states -i)
+        log.info(f"Remaining: {(i/n_states)*100:.1f}% ({i}/{n_states}) t: {t_remaining//60:.0f}:{t_remaining%60:.0f}")
+                
