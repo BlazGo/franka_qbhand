@@ -71,7 +71,7 @@ class PandaRobot:
         self.set_EE_load_client = rospy.ServiceProxy(self.set_EE_load_topic, SetLoad)
         self.switch_controller_proxy = rospy.ServiceProxy(self.switch_controller_topic, SwitchController)
         self.list_controllers_proxy = rospy.ServiceProxy(self.list_controllers_topic, ListControllers)
-        rospy.sleep(0.5)
+        rospy.sleep(0.25)
 
         self.used_controllers:list = [cnt.name for cnt in self.list_controllers(minimal=False)]
         self.log.info(f"Loaded controlers: {self.used_controllers}")
@@ -87,7 +87,7 @@ class PandaRobot:
         response = self.list_controllers(minimal=True)
         self.log.info(f"Controllers: {response}")
 
-        rospy.sleep(1.0)
+        rospy.sleep(0.5)
         
         response = self.set_EE_load(TOOL_MASS,
                                     F_X_CENTER_TOOL,
@@ -110,15 +110,13 @@ class PandaRobot:
         response = self.set_NE_T_EE_transform(NE_T_EE=T_new)
         self.log.debug(f"Response set EE trans: {response}")
         
-        rospy.sleep(1.0)
+        rospy.sleep(0.5)
 
         response = self.switch_controller(start_controllers=self.used_controllers)
         self.log.debug(f"Response switch controllers: {response}")
         
         self.log.info("Initializing QbHand")
         self.gripper = QbHand()
-        
-        rospy.sleep(1.0)
 
         self.log.info(f"Panda initialization {my_log.GREEN}DONE")
 
@@ -234,8 +232,8 @@ class PandaRobot:
 
     def cart_move_smooth(self, trans, rot):
         # TODO maybe add pid compensation
-        n_steps = 10
-        t_move = 4.0
+        n_steps = 20
+        t_move = 3.0
         dt = t_move / n_steps
         t = np.linspace(0, 1, n_steps)
 
@@ -253,20 +251,9 @@ class PandaRobot:
             value = my_tools.interpolate(t_curr)
             curr_trans = trans_start + diff_trans*value
             self.cart_move(trans=curr_trans,rot=rot)
+            
+            _trans, _ = self.get_cart_pose()
             rospy.sleep(dt)    
-        
-        # keep publishing the last position
-        timeout = 0
-        if self.move_feedback == True:
-            for _ in range(4):
-                self.cart_move(trans=curr_trans,rot=rot)
-                rospy.sleep(dt)
-                
-                _trans, _rot = self.get_cart_pose()
-                for i, ax in enumerate(_trans):
-                    diff = trans[i] -_trans[i]
-                    if diff > self.trans_tolerance:
-                        continue
                        
     def grasp(self, value:float, t:float=2.0):
         self.gripper.linear_move(value, move_time=t)
