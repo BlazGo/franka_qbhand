@@ -4,8 +4,6 @@ from gazebo_msgs.srv import SpawnModel, DeleteModel, GetModelState
 from geometry_msgs.msg import Point, Pose, Quaternion
 import my_log
 
-log = my_log.logger()
-
 
 class Model:
     
@@ -14,9 +12,12 @@ class Model:
     SPAWN_TOPIC = "/gazebo/spawn_sdf_model"
     STATE_TOPIC = "gazebo/get_model_state"
     
-    def __init__(self, name='/home/bg/custom_models/hca_box/model.sdf'):
+    def __init__(self, log_level=my_log.DEBUG, name='/home/bg/custom_models/hca_box/model.sdf'):
         self.MODEL_XML = name
         self.MODEL_NAME = "hca_box"
+        
+        self.log = my_log.logger(level=log_level)
+
         
         rospy.wait_for_service(self.SERVICE_TOPIC, timeout=10.0)
         
@@ -25,7 +26,7 @@ class Model:
         self._get_model_state = rospy.ServiceProxy(self.STATE_TOPIC, GetModelState)
 
     def spawn(self, pose=[0.6, 0, 0.05, 0, 0, 0]):
-        log.info(f"Spawning model: @{self.MODEL_NAME} {pose}")
+        self.log.info(f"Spawning model: @{self.MODEL_NAME} {pose}")
         quat = tf.transformations.quaternion_from_euler(pose[3], pose[4], pose[5])
         orient = Quaternion(quat[0], quat[1], quat[2], quat[3])
         model_pose = Pose(position = Point(x=pose[0], y=pose[1], z=pose[2]),
@@ -39,7 +40,7 @@ class Model:
         rospy.sleep(1)
 
     def delete(self):
-        log.info(f"Spawning model: @{self.MODEL_NAME}")
+        self.log.info(f"Deleting model: @{self.MODEL_NAME}")
         self._delete_model(model_name=self.MODEL_NAME)
         rospy.sleep(1)
 
@@ -52,7 +53,7 @@ class Model:
 
 
 if __name__ == "__main__":
-    model = Model()
+    model = Model(log_level=30)
     model.spawn()
     print(model.get_pose())
     model.delete()
