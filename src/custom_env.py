@@ -1,7 +1,9 @@
 import rospy
 from tf.transformations import quaternion_from_euler, euler_from_quaternion
 
-import gym
+import gymnasium as gym
+from stable_baselines3.common.env_checker import check_env
+
 import numpy as np
 import matplotlib.pyplot as plt
 import my_log
@@ -67,7 +69,7 @@ class CustomEnv(gym.Env):
         info = {}
         done = False
         reward = 0
-
+        
         # get array from action
         direction = self._action_to_direction[action]
 
@@ -86,7 +88,7 @@ class CustomEnv(gym.Env):
                        self.state_space_values["y"][self.state[1]],
                        self.state_space_values["r"][self.state[2]]]
         
-        self.log.info(f"State: {state} Actual: {robot_state}")
+        self.log.info(f"State: {self.state} Actual: {robot_state}")
 
         # spawn model at default coordinates
         self.model.spawn(pose=self.BASE_COORD_MODEL)
@@ -127,9 +129,9 @@ class CustomEnv(gym.Env):
         info = {"action": action,
                 "robot_state": robot_state}
 
-        return observation, reward, done, info
+        return observation, reward, terminated, done, info
 
-    def reset(self, state=[0, 0, 0]):
+    def reset(self, seed=None, state=np.array([0, 0, 0])):
         info = {}
         self.state = state
         
@@ -149,7 +151,8 @@ if __name__ == "__main__":
     
     rospy.init_node("gym_env")
     env = CustomEnv()
-    
+    check_env(env)
+
     reward_table = np.zeros(tuple(env.OBSERVATION_SPACE_SHAPE))
     observation, info = env.reset()
     
