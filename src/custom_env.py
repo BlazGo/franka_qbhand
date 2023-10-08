@@ -5,7 +5,7 @@ import gymnasium as gym
 from stable_baselines3.common.env_checker import check_env
 
 import numpy as np
-import matplotlib.pyplot as plt
+
 import my_log
 from gazeebo_model import Model
 from panda_robot import PandaRobot
@@ -50,15 +50,15 @@ class CustomEnv(gym.Env):
                                                     high=[0.05, 0.05, 80],
                                                     dtype=float)
 
-        # actual state space in [m] (symmetric)
-        x_range = 0.05
-        y_range = 0.05
-        r_range = 30
+        # actual state space in [m] [max, min]
+        x_range = [0.05, -0.05]
+        y_range = [0.05, -0.05]
+        r_range = [0, -60]
 
         # pack in a dictionary
-        self.state_space_values = {"x": np.linspace(-x_range, x_range, self.OBSERVATION_SPACE_SHAPE[0]),
-                                   "y": np.linspace(-y_range, y_range, self.OBSERVATION_SPACE_SHAPE[1]),
-                                   "r": np.linspace(-r_range, r_range, self.OBSERVATION_SPACE_SHAPE[2])}
+        self.state_space_values = {"x": np.linspace(x_range[0], x_range[1], self.OBSERVATION_SPACE_SHAPE[0]),
+                                   "y": np.linspace(y_range[0], y_range[1], self.OBSERVATION_SPACE_SHAPE[1]),
+                                   "r": np.linspace(r_range[0], r_range[1], self.OBSERVATION_SPACE_SHAPE[2])}
 
         # move robot to inital position
         self.robot.grasp(value=0.0)
@@ -68,6 +68,7 @@ class CustomEnv(gym.Env):
     def step(self, action: int, abs_state=None):
         info = {}
         done = False
+        terminated = False
         reward = 0
         
         # get array from action
@@ -75,21 +76,18 @@ class CustomEnv(gym.Env):
 
         if type(abs_state) != list:
             # add it to the state and clip to space
-            self.state = np.clip(a     = self.state + direction,
+            self.state = np.clip(a    = self.state + direction,
                                 a_min = [0, 0, 0],
                                 a_max = np.array(self.OBSERVATION_SPACE_SHAPE) - 1)
         else:
             # option to go to any state
             self.state = abs_state
 
-
         # construct the actual robot state
         robot_state = [self.state_space_values["x"][self.state[0]],
                        self.state_space_values["y"][self.state[1]],
                        self.state_space_values["r"][self.state[2]]]
         
-        self.log.info(f"State: {self.state} Actual: {robot_state}")
-
         # spawn model at default coordinates
         self.model.spawn(pose=self.BASE_COORD_MODEL)
 
@@ -127,6 +125,7 @@ class CustomEnv(gym.Env):
         
         observation = self.state
         info = {"action": action,
+                "state" : self.state,
                 "robot_state": robot_state}
 
         return observation, reward, terminated, done, info
@@ -143,39 +142,14 @@ class CustomEnv(gym.Env):
 
 
 if __name__ == "__main__":
-    import itertools
     import my_log
-    import time
     
     log = my_log.logger()
     
     rospy.init_node("gym_env")
     env = CustomEnv()
+    
+    # Check gym env conformity
     check_env(env)
-
-    reward_table = np.zeros(tuple(env.OBSERVATION_SPACE_SHAPE))
+    
     observation, info = env.reset()
-    
-    x = range(env.OBSERVATION_SPACE_SHAPE[0])
-    y = range(env.OBSERVATION_SPACE_SHAPE[1])
-    r = range(env.OBSERVATION_SPACE_SHAPE[2])
-
-    states = itertools.product(x, y, r)
-    n_states = len(x) * len(y) * len(r)
-    
-    i = 0
-    for state in states:
-        t1 = time.time()
-        i += 1
-
-        # ------ Actual step and reward ------ #
-        observation, reward, done, info = env.step(action=env.action_space.sample(), abs_state=state)
-        reward_table[state[0], state[1], state[2]] = reward
-        
-        # save progress
-        np.save("reward_table", reward_table)
-        
-        # loop time * remaining states
-        t_remaining = (time.time()-t1)*(n_states -i)
-        log.info(f"Remaining: {(i/n_states)*100:.1f}% ({i}/{n_states}) t: {t_remaining//60:.0f}:{t_remaining%60:.0f}")
-                
