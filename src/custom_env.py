@@ -24,13 +24,24 @@ class CustomEnv(gym.Env):
                             3: np.array([0, -1,  0]), # left
                             4: np.array([0,  0,  1]), # rot+
                             5: np.array([0,  0, -1])} # rot-
-
     N_DISCRETE_ACTIONS = 6
-    OBSERVATION_SPACE_SHAPE = [7, 7, 5]
 
-    def __init__(self, observation_space_type="MultiDiscrete", log_level=my_log.INFO):
+    def __init__(self, observation_space_shape:list=[7, 7, 5],
+                 x_range=[0.05, -0.05],
+                 y_range=[0.05, -0.05],
+                 r_range=[0, -60],
+                 observation_space_type="MultiDiscrete", log_level=my_log.INFO):
         super(CustomEnv, self).__init__()
-
+        
+        assert len(observation_space_shape) == 3, "Observation space shape "+\
+            "is currently expected to be only of length 3!"
+        self.OBSERVATION_SPACE_SHAPE = observation_space_shape
+        
+        # actual state space in [m] [max, min]
+        self.x_range = x_range
+        self.y_range = y_range
+        self.r_range = r_range
+        
         self.log = my_log.logger(level=my_log.INFO)
 
         self.model = Model(log_level=my_log.WARNING)
@@ -49,11 +60,6 @@ class CustomEnv(gym.Env):
             self.observation_space = gym.spaces.Box(low=[-0.05, -0.05, -80],
                                                     high=[0.05, 0.05, 80],
                                                     dtype=float)
-
-        # actual state space in [m] [max, min]
-        x_range = [0.05, -0.05]
-        y_range = [0.05, -0.05]
-        r_range = [0, -60]
 
         # pack in a dictionary
         self.state_space_values = {"x": np.linspace(x_range[0], x_range[1], self.OBSERVATION_SPACE_SHAPE[0]),
