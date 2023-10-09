@@ -8,20 +8,21 @@ from matplotlib import cm
 
 if __name__ == "__main__":
     reward_table = np.load("reward_table.npy")
-    
+    # weird unpacking saved as dict of arrays saved as array of dicts of arrays?
+    state_space = np.load("state_space.npy", allow_pickle=True)[()]
+        
     plt.rcParams["figure.figsize"] = [7.50, 3.50]
-    #plt.rcParams["figure.autolayout"] = True    
     
-    OBSERVATION_SPACE_SHAPE = [9, 9, 7]
+    OBSERVATION_SPACE_SHAPE = np.shape(reward_table)
     
-    x_range=[0.05, -0.05]
-    y_range=[0.05, -0.05]
-    r_range=[0, -60]
-    
-    x = np.linspace(x_range[0], x_range[1], OBSERVATION_SPACE_SHAPE[0])
-    y = np.linspace(y_range[0], y_range[1], OBSERVATION_SPACE_SHAPE[1])
-    r = np.linspace(r_range[0], r_range[1], OBSERVATION_SPACE_SHAPE[2])
+    x = state_space["x"]
+    y = state_space["y"]
+    r = state_space["r"]
 
+    print(f"Reward_table_shape = {OBSERVATION_SPACE_SHAPE}")
+    print(f"State_space info = {state_space}")
+    
+    # ------------ PLotting ---------------- #
     xv, yv = np.meshgrid(x, y)
 
     fig = plt.figure()
