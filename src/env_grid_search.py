@@ -12,16 +12,17 @@ if __name__ == "__main__":
     log = my_log.logger()
     
     rospy.init_node("gym_env")
-    env = CustomEnv()
-    #check_env(env)
+    
+    obs_shape = [9, 9, 7]
+    env = CustomEnv(observation_space_shape=obs_shape)
     observation, info = env.reset()
 
     # --- Reward table and all states iterator ---- #
     reward_table = np.zeros(tuple(env.OBSERVATION_SPACE_SHAPE))
     
-    x = range(env.OBSERVATION_SPACE_SHAPE[0])
-    y = range(env.OBSERVATION_SPACE_SHAPE[1])
-    r = range(env.OBSERVATION_SPACE_SHAPE[2])
+    x = range(obs_shape[0])
+    y = range(obs_shape[1])
+    r = range(obs_shape[2])
 
     # all possible combinations of lists
     states = list(itertools.product(x, y, r))
@@ -43,5 +44,5 @@ if __name__ == "__main__":
         
         # ------ loop time * remaining states ------ #
         t_remaining = (time.time()-t1)*(n_states -i)
-        log.info(f"State: {info['state']}, Robot_state: {info['robot_state']}, {(i/n_states)*100:.1f}% ({i}/{n_states}) Remaining: {t_remaining//60:.0f}:{t_remaining%60:.0f}")
+        log.info(f"State: {info['state']}, Actual: {info['robot_state']}, {(i/n_states)*100:.1f}% ({i}/{n_states}) Remaining: {t_remaining//60:.0f}:{t_remaining%60:.0f}")
                 
