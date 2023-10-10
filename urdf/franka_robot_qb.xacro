@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-  <xacro:macro name="franka_robot" params="arm_id qbhand joint_limits">
+  <xacro:macro name="franka_robot" params="arm_id joint_limits">
     <!-- Name of this panda -->
     <!-- Should a franka_gripper be mounted at the flange?" -->
     <xacro:arg name="hand" default="false" />
@@ -8,17 +8,17 @@
     <xacro:arg name="tcp_xyz" default="0 0 0.1034" />
     <!-- Rotational offset between $(arm_id)_hand -> $(arm_id)_hand_tcp [rad]. Only used when hand:=true -->
     <xacro:arg name="tcp_rpy" default="0 0 0" />
-    <!-- Is the robot being simulated in gazebo? -->
+    <!-- Is the robot being simulated in gazebo?" -->
     <xacro:arg name="gazebo" default="false" />
-
-    <!-- Qb hand parameters -->
-    <!-- Transform frame -->
-    <xacro:arg name="tcp_xyz_qb" default="0.1 -0.1 0.05" />
-    <xacro:arg name="tcp_rpy_qb" default="3.1416 -1.5708 -0.7854" />
-
+    
+    <!-- Positional offset between $(arm_id)_hand -> $(arm_id)_hand_tcp [m]. Only used when hand:=true -->
+    <xacro:arg name="qb_tcp_xyz" default="0.12 0 0.05" />
+    <!-- Rotational offset between $(arm_id)_hand -> $(arm_id)_hand_tcp [rad]. Only used when hand:=true -->
+    <xacro:arg name="qb_tcp_rpy" default="0.785398 -1.5707963 2.3561944" />
+    
     <xacro:include filename="$(find franka_description)/robots/common/utils.xacro" />
     <xacro:include filename="$(find franka_description)/robots/common/franka_arm.xacro" />
-    
+
     <xacro:franka_arm arm_id="${arm_id}" safety_distance="0.03" gazebo="$(arg gazebo)" joint_limits="${joint_limits}"/>
 
     <xacro:if value="$(arg hand)">
@@ -30,18 +30,66 @@
           tcp_rpy="$(arg tcp_rpy)"
           connected_to="$(arg arm_id)_link8"
           safety_distance="0.03"
-          gazebo="$(arg gazebo)"/>
+          gazebo="$(arg gazebo)"
+       />
     </xacro:if>
 
-    <xacro:if value="$(arg qbhand)">
+    <xacro:if value="$(arg use_qbhand)">
+      
+      <xacro:arg name="compensation_qb_tcp_xyz" default="-0.20 0.003 0.053"/>
+      <xacro:arg name="compensation_qb_tcp_xyz" default="-0.20 0.015 0.053"/>
+      <xacro:arg name="qb_mass" default="0.3735"/>
+
+      <joint name="EE_fix_joint" type="fixed">
+	      <origin xyz="0 0 0" rpy="0 0 -0.785398"/>
+	      <parent link="panda_link8" />
+	      <child link="EE_fix_link" />
+      </joint>
+
+      <link name="EE_fix_link">
+        <inertial>
+          <origin xyz="0 0 0"/>
+          <mass value="0.0"/>
+          <inertia ixx="0.0" ixy="0" ixz="0" iyy="0.0" iyz="0" izz="0.0"/>
+        </inertial>
+        <visual>
+          <geometry>
+            <box size="0.05 0.05 0.05"/>
+          </geometry>
+          <material name="gray"/>
+        </visual>
+      </link>
+
+      <joint name="mass_compensation_joint" type="fixed">
+	      <origin xyz="$(arg compensation_qb_tcp_xyz)" rpy="0 0 0"/>
+	      <parent link="EE_fix_link" />
+	      <child link="mass_compensation_link" />
+      </joint>
+            
+      <link name="mass_compensation_link">
+        <inertial>
+          <origin xyz="0 0 0"/>
+          <mass value="$(arg qb_mass)"/>
+          <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+        </inertial>
+        <visual>
+          <geometry>
+            <box size="0.05 0.05 0.05"/>
+          </geometry>
+          <material name="gray"/>
+        </visual>      
+      </link>
+      
       <xacro:include filename="$(find franka_qbhand)/urdf/softhands.xacro"/>
-      <xacro:softhands type="right"
-        version="v2.0_simple"
-        parent="$(arg arm_id)_link8"
-        position="$(arg tcp_xyz_qb)"
-        orientation="$(arg tcp_rpy_qb)"
-        operation_mode="0"
-        translation="0.0036"/>
+      <xacro:softhands
+        type = "right"
+        version = "v2.0_simple"
+        parent = "EE_fix_link"
+        position ="$(arg qb_tcp_xyz)"
+        orientation ="$(arg qb_tcp_rpy)"
+        operation_mode = "0"
+        translation="0.0036"
+      />
     </xacro:if>
 
     <!-- Define additional Gazebo tags -->

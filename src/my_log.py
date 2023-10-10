@@ -36,11 +36,13 @@ def cprint(level, msg, allign=False):
     print(date + prefix, end="")
     print(msg, end="") # separate prints
     print(END)
+
 class logger:
     def __init__(self, level:int=INFO, name:str=__name__, allign:bool=False) -> None:
         self.level = level
         self.name = name
         self.allign = allign
+        #self._print_logger_info()
     
     def _print_logger_info(self):
         self.info(f"Logger '{BLUE}{self.name}{END}' with level {BLUE}{self.level}{END}")
