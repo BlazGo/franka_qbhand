@@ -15,15 +15,16 @@ import my_tools
 from my_gripper import QbHand
 
 # EE frame parameters
-TOOL_MASS: float = 0.76 * 2 # [kg] (compensation mass on opposite side)
-TOOL_MASS: float = 0.0 # [kg] we already set it in launch file
+# TOOL_MASS: float = 0.76 * 2  # [kg] (compensation mass on opposite side)
+TOOL_MASS: float = 0.0  # [kg] we already set it in launch file
 
 # the two parameters below are not accurate
 F_X_CENTER_TOOL: list = [0.12, -0.0, 0.05]
-TOOL_INERTIA:list = [0.01, 0.0, 0.0,
-                     0.0, 0.01, 0.0,
-                     0.0, 0.0, 0.01]
-    
+TOOL_INERTIA: list = [0.01, 0.0, 0.0,
+                      0.0, 0.01, 0.0,
+                      0.0, 0.0, 0.01]
+
+
 class PandaRobot:
     # topics
     set_EE_frame_topic = "/franka_control/set_EE_frame"
@@ -40,16 +41,16 @@ class PandaRobot:
     EE_frame: str = "panda_EE"
 
     Q_INIT: list = [0, -0.785398163, 0, -2.35619449, 0, 1.57079632679, 0.785398163397]
-    DEFAULT_CART_STIFFNESS_TRANS:float = 200.0
-    DEFAULT_CART_STIFFNESS_ROT:float = 10.0
-    DEFAULT_CART_STIFFNESS_NULL:float = 0.5
+    DEFAULT_CART_STIFFNESS_TRANS: float = 200.0
+    DEFAULT_CART_STIFFNESS_ROT: float = 10.0
+    DEFAULT_CART_STIFFNESS_NULL: float = 0.5
     
     # controller strategies
     STRICT: int = 2
     BEST_EFFORT: int = 1
 
     def __init__(self, log_level=my_log.INFO, move_feedback=False):
-        self.log = my_log.logger(log_level)
+        self.log = my_log.Logger(log_level)
         self.log.info("Initializing PandaRobot class")
 
         # checking position to wait to finish the move
@@ -163,9 +164,9 @@ class PandaRobot:
     def set_NE_T_EE_transform(self, NE_T_EE: np.ndarray) -> SetEEFrameResponse:
         msg = SetEEFrameRequest()
         msg.NE_T_EE = NE_T_EE
-        respone = self.set_EE_frame_client.call(msg)
+        response = self.set_EE_frame_client.call(msg)
         rospy.sleep(0.5)
-        return respone
+        return response
 
     def set_EE_load(self, mass: float = 0.0, F_x_center_load: list = [0.0, 0.0, 0.0], load_inertia: list = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) -> SetLoadResponse:
         msg = SetLoadRequest()
@@ -180,8 +181,13 @@ class PandaRobot:
         rospy.sleep(0.5)
         return response
 
-    def switch_controller(self, start_controllers: list = [""], stop_controllers: list = [""], strictness: int = BEST_EFFORT, start_asap: bool = False) -> SwitchControllerResponse:
-        self.log.debug("Switching controllers")            
+    def switch_controller(self, start_controllers=None, stop_controllers=None, strictness: int = BEST_EFFORT, start_asap: bool = False) -> SwitchControllerResponse:
+        if stop_controllers is None:
+            stop_controllers = [""]
+        if start_controllers is None:
+            start_controllers = [""]
+
+        self.log.debug("Switching controllers")
         self.log.debug(f"Starting: {start_controllers}")
         self.log.debug(f"Stopping: {stop_controllers}")
         
@@ -196,18 +202,18 @@ class PandaRobot:
         rospy.sleep(1.0)
         return response
 
-    def list_controllers(self, minimal=True) -> ListControllersResponse:
+    def list_controllers(self, minimal=True) -> list:
         msg = ListControllersRequest()
         response = self.list_controllers_proxy.call(msg)
         if minimal:
-            cnts = [cnt.name for cnt in response.controller]
+            controllers = [cnt.name for cnt in response.controller]
             states = [cnt.state for cnt in response.controller]
             response = []
-            for i in range(len(cnts)):
-                response.append([cnts[i], states[i]])
+            for i in range(len(controllers)):
+                response.append([controllers[i], states[i]])
             return response 
         else:
-            return response.controller # Unpacks the actual list from msg
+            return response.controller  # Unpacks the actual list from msg
 
     def cart_move(self, trans, rot):
         msg = PoseStamped()
@@ -229,11 +235,11 @@ class PandaRobot:
     def cart_pid(self, trans, rot):
         t_move = 4.0
         err = 0
+        self.cart_move(trans, rot)
 
-    def cart_move_smooth(self, trans, rot):
+    def cart_move_smooth(self, trans, rot, t_move=2.0):
         # TODO maybe add pid compensation
-        n_steps = 20
-        t_move = 3.0
+        n_steps = 10
         dt = t_move / n_steps
         t = np.linspace(0, 1, n_steps)
 
@@ -255,8 +261,9 @@ class PandaRobot:
             _trans, _ = self.get_cart_pose()
             rospy.sleep(dt)    
                        
-    def grasp(self, value:float, t:float=2.0):
+    def grasp(self, value: float, t: float = 2.0):
         self.gripper.linear_move(value, move_time=t)
+
 
 if __name__ == "__main__":
 

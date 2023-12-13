@@ -16,7 +16,7 @@ class Model:
         self.MODEL_XML = name
         self.MODEL_NAME = "hca_box"
         
-        self.log = my_log.logger(level=log_level)
+        self.log = my_log.Logger(level=log_level)
 
         
         rospy.wait_for_service(self.SERVICE_TOPIC, timeout=10.0)

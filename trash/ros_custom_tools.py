@@ -6,7 +6,7 @@ from franka_msgs.srv import SetEEFrame, SetEEFrameRequest, SetEEFrameResponse
 import my_log
 
 if __name__ == "__main__":
-    log = my_log.logger(name="ros_tools", level=my_log.DEBUG)
+    log = my_log.Logger(name="ros_tools", level=my_log.DEBUG)
 
 
 class ComplianceWrapper:

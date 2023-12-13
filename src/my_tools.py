@@ -55,7 +55,7 @@ def interpolate(t:float):
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     import my_log
-    log = my_log.logger()
+    log = my_log.Logger()
     
     angle = 45 # [°] angle
     axis = "x"

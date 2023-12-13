@@ -9,10 +9,11 @@ import my_log
 
 
 if __name__ == "__main__":
-    log = my_log.logger()
-    
+    from datetime import datetime
+
     rospy.init_node("gym_env")
-    
+    log = my_log.Logger()
+
     obs_shape = [9, 9, 7]
     env = CustomEnv(observation_space_shape=obs_shape)
     observation, info = env.reset()
@@ -28,6 +29,8 @@ if __name__ == "__main__":
     states = list(itertools.product(x, y, r))
     n_states = len(states)
     
+    name_id = f"{datetime.now().date()}_{obs_shape[0]}-{obs_shape[1]}-{obs_shape[2]}"
+
     # ----------------- Main loop ----------------- #
     i = 0
     for state in track(states, "Progress"):
@@ -39,8 +42,8 @@ if __name__ == "__main__":
         reward_table[state[0], state[1], state[2]] = reward
         
         # ------------- Save progress ------------- #
-        np.save("reward_table", reward_table)
-        np.save("state_space", env.state_space_values)
+        np.save(f"reward_table_{name_id}", reward_table)
+        np.save(f"state_space_{name_id}", env.state_space_values)
         
         # ------ loop time * remaining states ------ #
         t_remaining = (time.time()-t1)*(n_states -i)
